@@ -1,27 +1,29 @@
-export function workflowId(state) {
-  return state.workflow.id;
+// Sometimes we may need to compute derived state based on store state,
+/**
+ * Get the currently selected stage
+ * @param state
+ * @returns {*}
+ */
+export function getSelectedStage(state) {
+	return state.workflow.stages.find((stage) => stage.id === state.workflow.selectedStageId);
 }
 
-export function workflowTitle(state) {
-  return state.workflow.title;
+/**
+ * Get the currently selected transition
+ * @param state
+ * @returns {*}
+ */
+export function getSelectedTransition(state) {
+	return state.workflow.transitions.find((transition) => transition.id === state.workflow.selectedTransitionId);
 }
 
-export function workflowStatus(state) {
-  return state.workflow.status;
-}
-
-export function stagesCount(state) {
-  return state.workflow.stagesCount;
-}
-
-export function transitionsCount(state) {
-  return state.workflow.transitionsCount;
-}
-
-export function stages(state) {
-  return state.workflow.stages;
-}
-
-export function transitions(state) {
-  return state.workflow.transitions;
-}
+/**
+ * Whether or not all items
+ * @param state
+ * @param getters
+ * @returns Array
+ */
+export const getSelectedWorkflowItems = (state, getters) => [
+	...getters.getSelectedStage.items,
+	...getters.getSelectedTransition.items,
+];

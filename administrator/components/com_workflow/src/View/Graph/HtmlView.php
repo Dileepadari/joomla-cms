@@ -12,6 +12,7 @@ namespace Joomla\Component\Workflow\Administrator\View\Graph;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\FileLayout;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\ToolbarHelper;
@@ -132,23 +133,36 @@ class HtmlView extends BaseHtmlView
     {
         Factory::getApplication()->getInput()->set('hidemainmenu', true);
 
+        $toolbar  = $this->getDocument()->getToolbar();
         $user     = $this->getCurrentUser();
         $userId   = $user->id;
-        $toolbar  = $this->getDocument()->getToolbar();
-        $canDo      = GraphHelper::getActions($this->extension, 'workflow', $this->item->id);
+        $canDo     = GraphHelper::getActions($this->extension, 'workflow', $this->item->id);
 
+        // Set the title
         ToolbarHelper::title(Text::_('COM_WORKFLOW_WORKFLOWS_EDIT'), 'file-alt contact');
 
         // Since it's an existing record, check the edit permission, or fall back to edit own if the owner.
         $itemEditable = $canDo->get('core.edit') || ($canDo->get('core.edit.own') && $this->item->created_by == $userId);
 
         if ($itemEditable){
-            if ($user->authorise('core.admin', 'com_content') || $user->authorise('core.options', 'com_content'))
-            {
-                $toolbar->preferences('com_content');
-            }
+            $layout = new FileLayout('toolbar.undo', JPATH_ADMINISTRATOR . '/components/com_workflow/layouts');
+            $toolbar->customButton('undo')
+                ->html($layout->render([]));
+            $toolbar->divider();
+
+            $layout = new FileLayout('toolbar.redo', JPATH_ADMINISTRATOR . '/components/com_workflow/layouts');
+            $toolbar->customButton('redo')
+                ->html($layout->render([]));
+            $toolbar->divider();
+
+            $layout = new FileLayout('toolbar.preview', JPATH_ADMINISTRATOR . '/components/com_workflow/layouts');
+            $toolbar->customButton('preview')
+                ->html($layout->render([]));
+            $toolbar->divider();
 
             $toolbar->help('Workflow');
+            $toolbar->apply('workflow.apply');
+            $toolbar->cancel('workflow.cancel', 'JTOOLBAR_CANCEL');
         }
     }
 }

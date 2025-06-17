@@ -11,3 +11,4 @@ window.WorkflowGraph.Event = new Event();
 
 // Create the Vue app instance
 createApp(App).use(store).use(translate).mount('#workflow-graph-root');
+
