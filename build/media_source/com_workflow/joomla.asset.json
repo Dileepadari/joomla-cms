@@ -18,6 +18,11 @@
     },
     {
       "name": "com_workflow.workflowgraph",
+      "type": "style",
+      "uri": "com_workflow/workflow-graph.min.css"
+    },
+    {
+      "name": "com_workflow.workflowgraph",
       "type": "script",
       "uri": "com_workflow/workflow-graph.min.js",
       "dependencies": [

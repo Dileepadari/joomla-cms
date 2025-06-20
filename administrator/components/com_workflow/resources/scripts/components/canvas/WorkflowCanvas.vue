@@ -13,7 +13,7 @@
       :default-viewport="{ zoom: 1, x: 0, y: 0 }"
     >
       <Background
-        pattern-color="#dee2e6"
+        pattern-color="var(--body-color)"
         :gap="20"
         variant="dots"
       />
@@ -45,6 +45,7 @@ import { VueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
+import StageNode from '../nodes/StageNode.vue'
 
 export default {
   name: 'WorkflowCanvas',
@@ -56,14 +57,25 @@ export default {
   },
   data() {
     return {
-      nodeTypes: {}, // dummy nodeTypes object
+      nodeTypes: {
+        stage: StageNode
+      },
     };
   },
   computed: {
     nodes() {
-      return this.$store?.state?.workflow?.stages || [];
+        return this.$store?.state?.workflow?.stages.map(stage => ({
+          id: stage.id,
+          type: 'stage',
+          position: { x: stage.x || 0, y: stage.y || 0 },
+          data: {
+            stage,
+            isSelected: this.$store.state.workflow.selectedStage === stage.id,
+          }
+      })) || [];
     },
     edges() {
+      console.log(this.$store?.state?.workflow?.transitions || []);
       return this.$store?.state?.workflow?.transitions || [];
     },
     isTransitionMode(){
@@ -77,7 +89,6 @@ export default {
     handleZoomOut() {}, // dummy handler
     handleFitView() {}, // dummy handler
     addStage() {
-      // Placeholder: implement add stage logic
       if (this.$store && this.$store.commit) {
         this.$store.commit('addStage', { id: Date.now(), title: 'New Stage' });
       }
