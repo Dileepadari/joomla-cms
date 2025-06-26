@@ -13,14 +13,11 @@ namespace Joomla\Component\Workflow\Administrator\View\Graph;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\FileLayout;
-use Joomla\CMS\MVC\View\FormView;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Router\Route;
-use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\Component\Workflow\Administrator\Helper\GraphHelper;
-use Joomla\Component\Workflow\Administrator\Model\GraphModel;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -102,7 +99,6 @@ class HtmlView extends BaseHtmlView
      */
     public function display($tpl = null)
     {
-        /** @var GraphModel $model */
         $model = $this->getModel();
 
         $this->state = $model->getState();

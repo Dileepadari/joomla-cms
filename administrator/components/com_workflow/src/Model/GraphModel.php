@@ -13,8 +13,6 @@ namespace Joomla\Component\Workflow\Administrator\Model;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\AdminModel;
-use Joomla\Registry\Registry;
-use Joomla\Utilities\ArrayHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -34,7 +32,7 @@ class GraphModel extends AdminModel
      *
      * @return  void
      *
-     * @since  4.0.0
+     * @since  _DEPLOY_VERSION_
      */
     public function populateState()
     {
@@ -47,6 +45,13 @@ class GraphModel extends AdminModel
         $this->setState('filter.extension', $extension);
     }
 
+    /**
+     * Method to get the name of the model.
+     *
+     * @return  string  The name of the model.
+     *
+     * @since   _DEPLOY_VERSION_
+     */
     public function getName()
     {
         return 'workflow'; // TODO: change it to to handdle dynamically
@@ -69,75 +74,19 @@ class GraphModel extends AdminModel
         return false;
     }
 
+    /**
+     * Method to get a table object, load it if necessary.
+     *
+     * @param   string  $name    The table name. Optional.
+     * @param   string  $prefix  A prefix for the table class name. Optional.
+     * @param   array   $options An optional associative array of configuration settings.
+     *
+     * @return  \Joomla\CMS\Table\Table|boolean  A Table object or false on failure
+     *
+     * @since   _DEPLOY_VERSION_
+     */
     public function getTable($name = '', $prefix = '', $options = [])
     {
         return parent::getTable($name, $prefix, $options); // TODO: Change the logic
     }
-
-    public function getItem($pk = null)
-    {
-        $pk    = (!empty($pk)) ? $pk : (int) $this->getState($this->getName() . '.id');
-        $table = $this->getTable();
-
-        if ($pk > 0) {
-            // Attempt to load the row.
-            $return = $table->load($pk);
-
-            // Check for a table object error.
-            if ($return === false) {
-                // If there was no underlying error, then the false means there simply was not a row in the db for this $pk.
-                if (!$table->getError()) {
-                    $this->setError(Text::_('JLIB_APPLICATION_ERROR_NOT_EXIST'));
-                } else {
-                    $this->setError($table->getError());
-                }
-
-                return false;
-            }
-        }
-
-
-
-        // Convert to \stdClass before adding other data
-        $properties = get_object_vars($table);
-        $item       = ArrayHelper::toObject($properties);
-        $stages = $this->getStagesForWorkflow($item->id);
-        $transitions = $this->getTransitionsForWorkflow($item->id);
-        $item->stages = $stages;
-        $item->transitions = $transitions;
-
-        if (property_exists($item, 'params')) {
-            $registry     = new Registry($item->params);
-            $item->params = $registry->toArray();
-        }
-
-        return $item;
-    }
-
-    protected function getStagesForWorkflow(int $workflowId): array
-    {
-        $db = $this->getDatabase();
-
-        $query = $db->getQuery(true)
-            ->select('*')
-            ->from($db->quoteName('#__workflow_stages'))
-            ->where($db->quoteName('workflow_id') . ' = ' . (int) $workflowId)
-            ->where($db->quoteName('published') . ' >= 0');
-
-        return $db->setQuery($query)->loadObjectList();
-    }
-
-    protected function getTransitionsForWorkflow(int $workflowId): array
-    {
-        $db = $this->getDatabase();
-
-        $query = $db->getQuery(true)
-            ->select('*')
-            ->from($db->quoteName('#__workflow_transitions'))
-            ->where($db->quoteName('workflow_id') . ' = ' . (int) $workflowId)
-            ->where($db->quoteName('published') . ' >= 0');
-
-        return $db->setQuery($query)->loadObjectList();
-    }
-
 }
