@@ -1,21 +1,24 @@
 <template>
-  <div class="w-100 h-100 position-relative" role="region" aria-label="Workflow Canvas">
+  <a href="#main-canvas" class="visually-hidden focusable">Skip to main content</a>
+  <div class="w-100 h-100 position-relative" role="application"  tabindex="0" aria-label="Workflow Canvas"   @keydown="onCanvasKeydown">
     <VueFlow
       v-if="!loading && !error"
+      max-zoom="2.5"
+      min-zoom="0.3"
       class="workflow-canvas"
+      fit-view-on-init
       :nodes="positionedNodes"
       :edges="styledEdges"
       :node-types="nodeTypes"
       :edge-types="edgeTypes"
-      fit-view-on-init
+      :connectable="true"
+      :elementsSelectable="true"
+      :snap-to-grid="true"
+      :snap-grid="[20, 20]"
       @connect="handleConnect"
       @pane-click="onPaneClick"
       @edge-click="onEdgeClick"
       @node-drag-stop="onNodeDragStop"
-      max-zoom="2.5"
-      min-zoom="0.3"
-      :snap-to-grid="true"
-      :snap-grid="[20, 20]"
     >
       <Background pattern-color="var(--body-color)" variant="dots" :gap="12" />
       <Controls
@@ -87,6 +90,7 @@
         </div>
       </dialog>
     </joomla-dialog>
+    <div aria-live="polite" class="visually-hidden" ref="liveRegion"></div>
   </div>
 </template>
 
@@ -198,8 +202,18 @@ export default {
           const sourceId = transition.from_stage_id === -1 ? 'from_any' : transition.from_stage_id.toString()
           const targetId = transition.to_stage_id.toString()
 
+          const isBiDirectional = transitions.value.some(t =>
+            t.from_stage_id === transition.to_stage_id && t.to_stage_id === transition.from_stage_id
+          )
+
+          let offsetIndex = 0
+          if (isBiDirectional) {
+            offsetIndex = transition.from_stage_id > transition.to_stage_id ? 1 : -1
+          }
+
           const isSelected = selectedTransition.value === transition.id
           const edgeColor = getEdgeColor(transition, isSelected)
+
 
           return {
             id: transition.id.toString(),
@@ -217,9 +231,13 @@ export default {
             data: {
               ...transition,
               isTransitionMode: isTransitionMode.value,
+              isSelected,
+              isBiDirectional,
+              offsetIndex,
               onDelete: () => deleteTransition(transition.id),
               onEdit: () => editTransition(transition.id)
-            }
+            },
+            draggable: !isTransitionMode.value
           }
         })
       } catch (error) {
@@ -401,6 +419,62 @@ export default {
       }, 100)
     })
 
+    function announce(message) {
+      if (this.$refs.liveRegion) {
+        this.$refs.liveRegion.textContent = message;
+      }
+    }
+
+
+    function onCanvasKeydown(e) {
+      if (e.key === 'N' && e.key === 'S' || e.key === 'n' && e.key === 's') {
+        addStage();
+        announce('Add Stage dialog opened.');
+        e.preventDefault();
+      }
+      if (e.key === 'N' && e.key === 'T' || e.key === 'n' && e.key === 't') {
+        addTransition();
+        announce('Add Transition dialog opened.');
+        e.preventDefault();
+      }
+      if (e.ctrlKey && (e.key === 'z' || e.key === 'Z')) {
+        store.dispatch('undo');
+        announce('Undo.');
+        e.preventDefault();
+      }
+      if (e.ctrlKey && (e.key === 'h' || e.key === 'H')) {
+        showHelpDialog();
+        e.preventDefault();
+      }
+      if (e.ctrlKey && (e.key === 'y' || e.key === 'Y')) {
+        store.dispatch('redo');
+        announce('Redo.');
+        e.preventDefault();
+      }
+      if (e.key === 'Escape') {
+        selectedStage.value = null;
+        selectedTransition.value = null;
+
+        if( modalActive.value) {
+          closeModal();
+        }
+        announce('Selection cleared.');
+        e.preventDefault();
+      }
+      if (e.key === 'T' && e.key === 'M' || e.key === 't' && e.key === 'm') {
+        toggleTransitionMode();
+        announce('Transition Mode ${isTransitionMode ? "on" : "off"}');
+        e.preventDefault();
+      }
+      if (selectedStage.value && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        const node = positionedNodes.value.find(n => n.id === selectedStage.value);
+        if (node) {
+          onNodeDragStop({ node });
+        }
+      }
+    }
+
+
     return {
       loading,
       error,
@@ -421,6 +495,7 @@ export default {
       onPaneClick,
       onEdgeClick,
       onNodeDragStop,
+      onCanvasKeydown
     }
   }
 }

@@ -3,6 +3,12 @@
     class="stage-node card p-3 border shadow-sm position-relative"
     :class="{ 'shadow': isSelected, 'hover-shadow': !isSelected }"
     :style="stageStyle"
+    tabindex="0"
+    role="button"
+    :aria-label="`Stage: ${stage?.title}. ${stage?.published ? 'Enabled' : 'Disabled'}`"
+    @keydown="onNodeKeydown"
+    @focus="onNodeFocus"
+    @blur="onNodeBlur"
     @click="onSelected"
   >
     <!-- VueFlow Handles -->
@@ -14,8 +20,8 @@
     <!-- Stage Header -->
     <div class="card-header d-flex justify-content-between align-items-start p-1">
       <div class="flex-fill w-75">
-        <h3 class="card-title mb-1 fw-semibold">{{ stage.title }}</h3>
-        <p class="card-text text-muted mb-0 text-truncate fw-light">{{ stage.description }}</p>
+        <h3 class="card-title mb-1 fw-semibold" :title=stage?.title>{{ stage.title }}</h3>
+        <p class="card-text text-muted mb-0 text-truncate" :title=stage?.description>{{ stage.description }}</p>
       </div>
 
       <!-- Actions -->
@@ -24,13 +30,14 @@
           @click.stop="data.onEdit"
           class="btn btn-lg btn-secondary py-0 px-1 mr-2"
           title="Edit Stage"
+
         >
           <i class="icon icon-pencil"></i>
         </button>
         <button
           @click.stop="data.onDelete"
           class="btn btn-lg btn-danger py-0 px-1 mx-2"
-          title="Delete Stage"
+          title="Trash Stage"
         >
           <i class="icon icon-trash"></i>
         </button>
@@ -108,6 +115,37 @@ export default {
     },
     onSelected() {
       this.data.onSelect()
+    },
+    announce(message) {
+      if (this.$refs.liveRegion) {
+        this.$refs.liveRegion.textContent = message;
+      }
+}
+  },
+  methods: {
+    onNodeKeydown(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        this.data.onSelect();
+        e.preventDefault();
+      }
+      if (e.key === 'e' || e.key === 'E') {
+        this.data.onEdit();
+        e.preventDefault();
+      }
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        this.data.onDelete();
+        e.preventDefault();
+      }
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+        this.$emit('navigate', e.key);
+        e.preventDefault();
+      }
+    },
+    onNodeFocus() {
+      this.announce(`Stage ${this.stage.title} focused.`);
+    },
+    onNodeBlur() {
+      // Remove focus style if needed
     }
   }
 }

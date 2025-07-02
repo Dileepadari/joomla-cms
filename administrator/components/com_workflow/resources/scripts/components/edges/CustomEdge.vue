@@ -9,8 +9,16 @@
       :marker-end="markerEnd"
     />
 
-    <foreignObject :x="labelX - 75" :y="labelY - 20" width="150" height="40" class="edge-label">
-      <div class="d-flex align-items-center border bg-primary text-white rounded shadow-sm px-2 py-1 gap-1">
+    <foreignObject :x="labelX - 70" :y="labelY - 20" width="150" height="40" class="edge-label">
+      <div
+        class="d-flex align-items-center border text-bg-info rounded shadow-sm px-2 py-1 gap-1"
+        tabindex="0"
+        role="button"
+        :aria-label="`Transition: ${data?.title}`"
+        @keydown="onEdgeKeydown"
+        @focus="onEdgeFocus"
+        @blur="onEdgeBlur"
+      >
         <span
           class="text-truncate text-center flex-grow-1 fw-semibold"
           :style="{ maxWidth: data?.isTransitionMode ? '80px' : '100%' }"
@@ -75,8 +83,21 @@ export default {
       return this.edgeData[1]
     },
     labelY() {
-      return this.edgeData[2]
+      return this.edgeData[2] + (this.data?.offsetIndex || 0) * 18
+    }
+  },
+  methods: {
+    onEdgeKeydown(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        this.data.onEdit?.();
+        e.preventDefault();
+      }
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        this.data.onDelete?.();
+        e.preventDefault();
+      }
     }
   }
+
 }
 </script>
