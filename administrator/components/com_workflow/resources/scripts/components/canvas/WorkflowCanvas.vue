@@ -32,7 +32,7 @@
         <button @click="addStage" class="btn btn-primary" :disabled="loading">
           <span class="icon icon-plus"></span> Add Stage
         </button>
-        <button @click="addTransition" class="btn btn-info text-white" :disabled="loading">
+        <button @click="addTransition" class="btn btn-info" :disabled="loading">
           <span class="icon icon-plus"></span> Add Transition
         </button>
         <button
@@ -136,6 +136,7 @@ export default {
     const transitions = computed(() => store.getters.transitions || [])
     const loading = computed(() => store.getters.loading)
     const error = computed(() => store.getters.error)
+    const workflowId = computed(() => store.getters.workflowId)
 
     const positionedNodes = computed(() => {
       try {
@@ -163,7 +164,7 @@ export default {
               },
               isSelected: selectedStage.value === stage.id,
               onSelect: () => selectStage(stage.id),
-              onEdit: () => editStage(stage),
+              onEdit: () => editStage(stage.id),
               onDelete: () => deleteStage(stage.id)
             },
             draggable: !isTransitionMode.value
@@ -258,16 +259,22 @@ export default {
       }
     }
 
-    function editStage(stage) {
-      openModal('stage', stage.id)
+    function editStage(stageId) {
+      openModal('stage', stageId)
     }
 
-    function editTransition(transition) {
-      openModal('transition', transition.id)
+    function editTransition(transitionId) {
+      openModal('transition', transitionId)
     }
 
-    function deleteStage() {
-      // Implement deletion logic
+    function deleteStage(id) {
+      store.dispatch('deleteStage', { id, workflowId: workflowId.value })
+      selectedStage.value = null
+    }
+
+    function deleteTransition(id) {
+      store.dispatch('deleteTransition', { id, workflowId: workflowId.value })
+      selectedTransition.value = null
     }
 
     async function handleConnect() {
@@ -301,6 +308,7 @@ export default {
     }
 
     async function onNodeDragStop({ node }) {
+      if(!node || !node.id || node.id === 'from_any') return
       const position = store.getters.stages.find(s => s.id === parseInt(node.id)).position
       if (node?.id) {
           const nodePosition = node.computedPosition || position || { x: 0, y: 0 }
@@ -333,10 +341,9 @@ export default {
 
 
     function openModal(type, id = null) {
-      const workflowId = store.getters.workflowId
       const extension = Joomla.getOptions('com_workflow', {})?.extension || null
 
-      let base = `index.php?option=com_workflow&view=${type}&workflow_id=${workflowId}&extension=${extension}&layout=modal&tmpl=component`
+      let base = `index.php?option=com_workflow&view=${type}&workflow_id=${workflowId.value}&extension=${extension}&layout=modal&tmpl=component`
       if (id) {
         base += `&id=${id}`
       }
@@ -354,16 +361,12 @@ export default {
       selectedStage.value = null
       selectedTransition.value = null
 
-      const workflowId = store.getters.workflowId
-      if (workflowId) {
-        retryLoad()
-      }
+      retryLoad()
     }
 
     function retryLoad() {
-      const workflowId = store.getters.workflowId
-      if (workflowId) {
-        store.dispatch('loadWorkflow', workflowId)
+      if (workflowId.value) {
+        store.dispatch('loadWorkflow', workflowId.value)
       }
     }
 

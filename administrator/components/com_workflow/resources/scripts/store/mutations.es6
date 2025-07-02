@@ -42,14 +42,18 @@ export default {
 		state.transitions = state.transitions.filter(t => t.id !== id);
 	},
 	UPDATE_STAGE_POSITION(state, { id, x, y }) {
-		const index = state.stages.findIndex(s => s.id === id);
-		if (index !== -1) {
-			const updatedStage = JSON.parse(JSON.stringify(state.stages[index]));
-			updatedStage.position = { x, y };
-			state.stages.splice(index, 1, updatedStage);
-		}
-		console.log(`Updated position of stage ${id} to (${x}, ${y})`);
-		console.log(state.stages);
+		state.stages= state.stages.map(stage => {
+			if (stage.id.toString() === id) {
+				return {
+					...stage,
+					position: {
+						x: x,
+						y: y
+					}
+				};
+			}
+			return stage;
+		});
 	},
 	ADD_TO_HISTORY(state, snapshot) {
 		// Remove any future states if we're in the middle of the history
@@ -66,20 +70,19 @@ export default {
 			state.historyIndex--;
 		}
 	},
-	UNDO(state) {
-		if (state.historyIndex > 0) {
-			state.historyIndex--;
+	UNDO_REDO(state, direction) {
+		if ((state.historyIndex > 0 && direction === -1) || (state.historyIndex < state.history.length - 1 && direction === 1)) {
+			state.historyIndex = state.historyIndex + direction;
 			const snapshot = state.history[state.historyIndex];
-			state.stages = JSON.parse(JSON.stringify(snapshot.stages));
-			state.transitions = JSON.parse(JSON.stringify(snapshot.transitions));
-		}
-	},
-	REDO(state) {
-		if (state.historyIndex < state.history.length - 1) {
-			state.historyIndex++;
-			const snapshot = state.history[state.historyIndex];
-			state.stages = JSON.parse(JSON.stringify(snapshot.stages));
-			state.transitions = JSON.parse(JSON.stringify(snapshot.transitions));
+			state.stages = state.stages.map(stage => {
+				const historyStage = snapshot.stagePositions.find(s => s.id === stage.id);
+				if (historyStage) {
+					return {
+						...stage,
+						position: historyStage.position
+					}
+				}
+			});
 		}
 	}
 };

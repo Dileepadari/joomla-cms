@@ -27,33 +27,28 @@ class WorkflowGraphApi {
       headers: {
         'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest'
-      }
+      },
     };
 
-    // Add CSRF token for POST requests
-    if (options.method === 'POST' && this.csrfToken) {
-      defaultOptions.headers['X-CSRF-Token'] = this.csrfToken;
+    // add csrf for all request as data [token] = 1
+    if (this.csrfToken) {
+      if (!options.data) {
+        options.data = {};
+      }
+      options.data[this.csrfToken] = '1';
     }
 
     const config = { ...defaultOptions, ...options };
 
+    if (options.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
     return new Promise((resolve, reject) => {
       Joomla.request({
         url: `${this.baseUrl}${url}&extension=${this.extension}`,
         ...config,
         onSuccess: (response) => {
-          try {
-            const data = typeof response === 'string' ? JSON.parse(response) : response;
-
-            if (data.success === false) {
-              reject(new Error(data.message || 'Request failed'));
-              return;
-            }
-
-            resolve(data.data || data);
-          } catch (e) {
-            reject(new Error('Invalid JSON response'));
-          }
+          resolve(response);
         },
         onError: (xhr) => {
           let message = 'Network error';
@@ -71,9 +66,15 @@ class WorkflowGraphApi {
 
   async getWorkflow(id) {
     try {
-      const data = await this.makeRequest(`&task=graph.getWorkflow&id=${id}&format=json`);
-      WorkflowGraph.Event.fire('onWorkflowLoaded', { workflow: data });
-      return data;
+      const response = await this.makeRequest(`&task=graph.getWorkflow&id=${id}&format=json`);
+      const data = typeof response === 'string' ? JSON.parse(response) : response;
+
+      if (data.success === false) {
+        WorkflowGraph.Event.fire('onWorkflowError', { error: data.message || 'Failed to load workflow' });
+        return;
+      }
+
+      return data.data || data;
     } catch (error) {
       WorkflowGraph.Event.fire('onWorkflowError', { error: error.message });
       throw error;
@@ -82,9 +83,15 @@ class WorkflowGraphApi {
 
   async getStages(workflowId) {
     try {
-      const data = await this.makeRequest(`&task=graph.getStages&workflow_id=${workflowId}&format=json`);
-      WorkflowGraph.Event.fire('onStagesLoaded', { stages: data });
-      return data;
+      const response = await this.makeRequest(`&task=graph.getStages&workflow_id=${workflowId}&format=json`);
+      const data = typeof response === 'string' ? JSON.parse(response) : response;
+
+      if (data.success === false) {
+        WorkflowGraph.Event.fire('onStagesError', { error: data.message || 'Failed to load stages' });
+        return;
+      }
+
+      return data.data || data;
     } catch (error) {
       WorkflowGraph.Event.fire('onStagesError', { error: error.message });
       throw error;
@@ -93,21 +100,43 @@ class WorkflowGraphApi {
 
   async getTransitions(workflowId) {
     try {
-      const data = await this.makeRequest(`&task=graph.getTransitions&workflow_id=${workflowId}&format=json`);
-      WorkflowGraph.Event.fire('onTransitionsLoaded', { transitions: data });
-      return data;
+      const response = await this.makeRequest(`&task=graph.getTransitions&workflow_id=${workflowId}&format=json`);
+      const data = typeof response === 'string' ? JSON.parse(response) : response;
+
+      if (data.success === false) {
+        WorkflowGraph.Event.fire('onTransitionsError', { error: data.message || 'Failed to load transitions' });
+        return;
+      }
+
+      return data.data || data;
     } catch (error) {
       WorkflowGraph.Event.fire('onTransitionsError', { error: error.message });
       throw error;
     }
   }
 
-  async deleteStage(id) {
+  async deleteStage(id, workflowId) {
     try {
-      await this.makeRequest(`&task=stage.deleteStage&id=${id}&format=json`, {
-        method: 'POST'
+      const formData = new FormData();
+      formData.append('cid[]', id);
+      formData.append('workflow_id', workflowId);
+
+      if (this.csrfToken) {
+        formData.append(this.csrfToken, '1');
+      }
+
+      const response = await this.makeRequest(`&task=stages.trash&format=raw`, {
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false
       });
-      WorkflowGraph.Event.fire('onStageDeleted', { id });
+
+      if (response.success === false) {
+        WorkflowGraph.Event.fire('onStageError', { error: response.message || 'Failed to delete stage' });
+        return false;
+      }
+
       return true;
     } catch (error) {
       WorkflowGraph.Event.fire('onStageError', { error: error.message });
@@ -115,11 +144,23 @@ class WorkflowGraphApi {
     }
   }
 
-  async deleteTransition(id) {
+  async deleteTransition(id, workflowId) {
     try {
-      await this.makeRequest(`&task=transition.deleteTransition&id=${id}&format=json`, {
-        method: 'POST'
+      const formData = new FormData();
+      formData.append('cid[]', id);
+      formData.append('workflow_id', workflowId);
+
+      if (this.csrfToken) {
+        formData.append(this.csrfToken, '1');
+      }
+
+      await this.makeRequest(`&task=transitions.trash&format=raw`, {
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false
       });
+
       WorkflowGraph.Event.fire('onTransitionDeleted', { id });
       return true;
     } catch (error) {

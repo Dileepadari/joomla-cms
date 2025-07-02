@@ -47,10 +47,12 @@ export default {
 	 * Delete a stage from the workflow.
 	 * @param commit
 	 * @param dispatch
+	 * @param state
 	 * @param id
+	 * @param workflowId
 	 * @returns {Promise<void>}
 	 */
-	async deleteStage({ commit, dispatch }, id) {
+	async deleteStage({ commit, dispatch, state }, { id, workflowId }) {
 		if (!confirm('Are you sure you want to delete this stage? This action cannot be undone.')) {
 			return;
 		}
@@ -67,7 +69,7 @@ export default {
 				throw new Error('COM_WORKFLOW_ERROR_STAGE_HAS_TRANSITIONS');
 			}
 
-			await workflowGraphApi.deleteStage(id);
+			await workflowGraphApi.deleteStage(id, workflowId);
 			commit('REMOVE_STAGE', id);
 
 			if (window.Joomla && window.Joomla.renderMessages) {
@@ -84,32 +86,9 @@ export default {
 					error: [errorMessage]
 				});
 			}
-
-			throw error;
 		} finally {
 			commit('SET_LOADING', false);
-		}
-	},
-
-	/**
-	 * Update an existing transition in the workflow.
-	 * @param commit
-	 * @param dispatch
-	 * @param transition
-	 * @returns {Promise<Object>} The updated transition object.
-	 */
-	async updateTransition({ commit, dispatch }, transition) {
-		commit('SET_LOADING', true);
-		commit('SET_ERROR', null);
-		try {
-			const updatedTransition = await workflowGraphApi.saveTransition(transition);
-			commit('UPDATE_TRANSITION', updatedTransition);
-			return updatedTransition;
-		} catch (error) {
-			commit('SET_ERROR', error.message);
-			throw error;
-		} finally {
-			commit('SET_LOADING', false);
+			await dispatch('loadWorkflow', workflowId);
 		}
 	},
 
@@ -118,13 +97,14 @@ export default {
 	 * @param commit
 	 * @param dispatch
 	 * @param id
+	 * @param workflowId
 	 * @returns {Promise<void>}
 	 */
-	async deleteTransition({ commit, dispatch }, id) {
+	async deleteTransition({ commit, dispatch }, { id, workflowId }) {
 		commit('SET_LOADING', true);
 		commit('SET_ERROR', null);
 		try {
-			await workflowGraphApi.deleteTransition(id);
+			await workflowGraphApi.deleteTransition(id, workflowId);
 			commit('REMOVE_TRANSITION', id);
 		} catch (error) {
 			commit('SET_ERROR', error.message);
@@ -135,11 +115,8 @@ export default {
 	},
 
 	updateStagePosition({ commit, dispatch }, { id, x, y }) {
-		console.log(`Updating position of stage ${id} to (${x}, ${y})`);
-		console.log()
 		commit('UPDATE_STAGE_POSITION', { id, x, y });
 		dispatch('saveToHistory');
-
 	},
 
 	/**
@@ -150,10 +127,11 @@ export default {
 	 *
 	 */
 	saveToHistory({ commit, state }) {
-		// Create a deep copy of the current state for history
 		const snapshot = {
-			stages: JSON.parse(JSON.stringify(state.stages)),
-			transitions: JSON.parse(JSON.stringify(state.transitions))
+			stagePositions: state.stages.map(stage => ({
+				id: stage.id,
+				position: stage.position
+			}))
 		};
 		commit('ADD_TO_HISTORY', snapshot);
 	},
@@ -164,7 +142,11 @@ export default {
 	 * @returns {Promise<void>}
 	 */
 	undo({ commit }) {
-		commit('UNDO');
+		commit('SET_LOADING', true);
+		commit('SET_ERROR', null);
+		commit('UNDO_REDO', -1);
+		commit('SET_LOADING', false);
+
 	},
 
 	/**
@@ -173,6 +155,9 @@ export default {
 	 * @returns {Promise<void>}
 	 */
 	redo({ commit }) {
-		commit('REDO');
+		commit('SET_LOADING', true);
+		commit('SET_ERROR', null);
+		commit('UNDO_REDO', 1);
+		commit('SET_LOADING', false);
 	}
 };

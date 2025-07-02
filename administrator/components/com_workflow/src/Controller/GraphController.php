@@ -11,9 +11,11 @@
 
 namespace Joomla\Component\Workflow\Administrator\Controller;
 
+use Joomla\CMS\Application\CMSWebApplicationInterface;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\AdminController;
 use Joomla\CMS\Response\JsonResponse;
+use Joomla\Utilities\ArrayHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -92,12 +94,12 @@ class GraphController extends AdminController
             }
 
             $response = [
-                'id' => $workflow->id,
-                'title' => $workflow->title,
+                'id'          => $workflow->id,
+                'title'       => $workflow->title,
                 'description' => $workflow->description,
-                'published' => (bool)$workflow->published,
-                'default' => (bool)$workflow->default,
-                'extension' => $workflow->extension
+                'published'   => (bool) $workflow->published,
+                'default'     => (bool) $workflow->default,
+                'extension'   => $workflow->extension
             ];
 
             echo new JsonResponse($response);
@@ -138,13 +140,13 @@ class GraphController extends AdminController
                 }
 
                 $response[] = [
-                    'id' => (int)$stage->id,
-                    'title' => $stage->title,
+                    'id'          => (int) $stage->id,
+                    'title'       => $stage->title,
                     'description' => $stage->description,
-                    'published' => (bool)$stage->published,
-                    'default' => (bool)$stage->default,
-                    'ordering' => (int)$stage->ordering,
-                    'position' => $position,
+                    'published'   => (bool) $stage->published,
+                    'default'     => (bool) $stage->default,
+                    'ordering'    => (int) $stage->ordering,
+                    'position'    => $position,
                     'workflow_id' => $stage->workflow_id,
                 ];
             }
@@ -181,14 +183,14 @@ class GraphController extends AdminController
 
             foreach ($transitions as $transition) {
                 $response[] = [
-                    'id' => (int)$transition->id,
-                    'title' => $transition->title,
-                    'description' => $transition->description,
-                    'published' => (bool)$transition->published,
-                    'from_stage_id' => (int)$transition->from_stage_id,
-                    'to_stage_id' => (int)$transition->to_stage_id,
-                    'ordering' => (int)$transition->ordering,
-                    'workflow_id' => (int)$transition->workflow_id
+                    'id'            => (int) $transition->id,
+                    'title'         => $transition->title,
+                    'description'   => $transition->description,
+                    'published'     => (bool) $transition->published,
+                    'from_stage_id' => (int) $transition->from_stage_id,
+                    'to_stage_id'   => (int) $transition->to_stage_id,
+                    'ordering'      => (int) $transition->ordering,
+                    'workflow_id'   => (int) $transition->workflow_id
                 ];
             }
 
