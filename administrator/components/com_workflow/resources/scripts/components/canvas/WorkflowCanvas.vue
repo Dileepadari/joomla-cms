@@ -6,23 +6,26 @@
       :nodes="positionedNodes"
       :edges="styledEdges"
       :node-types="nodeTypes"
+      :edge-types="edgeTypes"
       fit-view-on-init
       @connect="handleConnect"
       @pane-click="onPaneClick"
       @edge-click="onEdgeClick"
       @node-drag-stop="onNodeDragStop"
       max-zoom="2.5"
-      min-zoom="0.4"
-      :connection-mode="isTransitionMode ? 'loose' : 'strict'"
+      min-zoom="0.3"
       :snap-to-grid="true"
       :snap-grid="[20, 20]"
     >
       <Background pattern-color="var(--body-color)" variant="dots" :gap="12" />
-      <Controls position="bottom-right" />
+      <Controls
+        position="bottom-right"
+        aria-label="Workflow controls"
+      />
       <MiniMap
         position="bottom-left"
         :node-color="(node) => node.data?.stage?.color || '#0d6efd'"
-        :mask-color="'rgba(255, 255, 255, 0.8)'"
+        :mask-color="'rgba(255, 255, 255, 0.6)'"
         pannable
         zoomable
         aria-label="Workflow minimap"
@@ -95,6 +98,7 @@ import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
 import stageNode from '../nodes/StageNode.vue'
+import customEdge from '../edges/CustomEdge.vue'
 export default {
   name: 'WorkflowCanvas',
   components: { VueFlow, Background, Controls, MiniMap, Panel },
@@ -105,6 +109,12 @@ export default {
         stage: stageNode
       })
     },
+    edgeTypes: {
+      type: Object,
+      default: () => ({
+        custom: customEdge
+      })
+    }
   },
   emits: [
     'update-stage-position',
@@ -195,8 +205,7 @@ export default {
             id: transition.id.toString(),
             source: sourceId,
             target: targetId,
-            label: transition.title,
-            type: 'smoothstep',
+            type: 'custom',
             animated: isSelected,
             style: {
               stroke: edgeColor,
@@ -205,7 +214,12 @@ export default {
               zIndex: isSelected ? 1000 : 1
             },
             markerEnd: { type: 'arrow', width: 20, height: 20, color: edgeColor },
-            data: transition
+            data: {
+              ...transition,
+              isTransitionMode: isTransitionMode.value,
+              onDelete: () => deleteTransition(transition.id),
+              onEdit: () => editTransition(transition.id)
+            }
           }
         })
       } catch (error) {
@@ -223,7 +237,8 @@ export default {
         data: {
           stage: { id, title, color, published: 1, special: true },
           isSelected: selectedStage.value === id,
-          onSelect: () => selectStage(id)
+          onSelect: () => selectStage(id),
+          isSpecial: true,
         },
         draggable: !isTransitionMode.value
       }
@@ -379,7 +394,9 @@ export default {
     onMounted(() => {
       setTimeout(() => {
         if (store.getters.stages.length || store.getters.transitions.length) {
-          fitView()
+          fitView({
+            padding: { top: 50, right: 50, bottom: 50, left: 50 }
+          })
         }
       }, 100)
     })

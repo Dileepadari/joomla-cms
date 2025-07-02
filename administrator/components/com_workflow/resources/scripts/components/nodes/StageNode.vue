@@ -19,17 +19,17 @@
       </div>
 
       <!-- Actions -->
-      <div class="stage-card-actions d-flex align-items-center ms-2">
+      <div class="stage-card-actions align-items-center mr-2" :class="data?.isSpecial ? 'd-none' : 'd-flex'">
         <button
           @click.stop="data.onEdit"
-          class="btn btn-sm text-muted"
+          class="btn btn-lg btn-secondary py-0 px-1 mr-2"
           title="Edit Stage"
         >
           <i class="icon icon-pencil"></i>
         </button>
         <button
           @click.stop="data.onDelete"
-          class="btn btn-sm text-muted"
+          class="btn btn-lg btn-danger py-0 px-1 mx-2"
           title="Delete Stage"
         >
           <i class="icon icon-trash"></i>
@@ -37,9 +37,7 @@
       </div>
     </div>
 
-    <!-- Stage Body -->
     <div class="card-body p-1 pt-0">
-      <!-- Status -->
       <div class="d-flex justify-content-between align-items-center mb-2">
         <span
           :class="stage.published ? 'bg-success' : 'bg-danger'"
@@ -48,7 +46,6 @@
           {{ stage.published ? 'Enabled' : 'Disabled' }}
         </span>
 
-        <!-- Stage Type Badges -->
         <div class="d-flex gap-1">
           <span
             v-if="stage.default"
