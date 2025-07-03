@@ -11,14 +11,26 @@
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+use Joomla\CMS\Router\Route;
+
+
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $this->getDocument()->getWebAssetManager();
 $wa->useScript('keepalive');
+$wa->useScript('form.validate');
 $wa->useStyle('com_workflow.workflowgraph');
 
-
+$app   = Factory::getApplication();
+$user  = $app->getIdentity();
+$input = $app->getInput();
 // Get the URI for the JavaScript module
 $script = $wa->getAsset('script', name: 'com_workflow.workflowgraph')->getUri(true);
 ?>
 <div id="workflow-graph-root"></div>
+<form action="#" id="adminForm" name="adminForm" method="post" class="form-validate" style="display:none;">
+    <input type="hidden" name="task" value="" />
+    <input type="hidden" name="positions" id="workflow_positions" value="" />
+    <input type="hidden" name="<?php echo JSession::getFormToken(); ?>" value="1" />
+</form>
 <script type="module" src="<?php echo $script ?>"></script>

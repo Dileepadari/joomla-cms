@@ -77,4 +77,5 @@ class GraphModel extends AdminModel
     {
         return parent::getTable($name, $prefix, $options);
     }
+
 }

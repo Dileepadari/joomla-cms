@@ -14,7 +14,10 @@ namespace Joomla\Component\Workflow\Administrator\Controller;
 use Joomla\CMS\Application\CMSWebApplicationInterface;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\AdminController;
+use Joomla\CMS\MVC\Controller\FormController;
+use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\Response\JsonResponse;
+use Joomla\CMS\Router\Route;
 use Joomla\Utilities\ArrayHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -60,6 +63,42 @@ class GraphController extends AdminController
      * @since  _DEPLOY_VERSION_
      */
     protected $text_prefix = 'COM_WORKFLOW_GRAPH';
+
+
+    public function __construct($config = [], ?MVCFactoryInterface $factory = null, $app = null, $input = null)
+    {
+        parent::__construct($config, $factory, $app, $input);
+
+        // If workflow id is not set try to get it from input or throw an exception
+        if (empty($this->workflowId)) {
+            $this->workflowId = $this->input->getInt('id');
+            if (empty($this->workflowId)) {
+                $this->workflowId = $this->input->getInt('workflow_id');
+            }
+
+            if (empty($this->workflowId)) {
+                throw new \InvalidArgumentException(Text::_('COM_WORKFLOW_ERROR_WORKFLOW_ID_NOT_SET'));
+            }
+        }
+
+        // If extension is not set try to get it from input or throw an exception
+        if (empty($this->extension)) {
+            $extension = $this->input->getCmd('extension');
+
+            $parts = explode('.', $extension);
+
+            $this->extension = array_shift($parts);
+
+            if (!empty($parts)) {
+                $this->section = array_shift($parts);
+            }
+
+            if (empty($this->extension)) {
+                throw new \InvalidArgumentException(Text::_('COM_WORKFLOW_ERROR_EXTENSION_NOT_SET'));
+            }
+        }
+    }
+
 
     /**
      * Retrieves workflow data for graphical display in the workflow graph view.
@@ -194,5 +233,75 @@ class GraphController extends AdminController
         }
 
         $this->app->close();
+    }
+
+    /**
+     * Method to save stage positions
+     *
+     * @return  boolean  True if successful, false otherwise.
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    public function save()
+    {
+        // Check for request forgeries
+        $this->checkToken();
+
+        $app = $this->app;
+        $input = $app->input;
+        $workflowId = $input->getInt('id');
+        $extension = $this->input->getCmd('extension');
+        $options = $input->getCmd('option');
+
+        $task = $this->getTask();
+
+        $positionsJson = $input->getString('positions', '');
+        $positions = [];
+
+        if (!empty($positionsJson)) {
+            try {
+                $positions = json_decode($positionsJson, true);
+            } catch (\Exception $e) {
+                $app->enqueueMessage($e->getMessage(), 'error');
+            }
+        }
+
+        // Update positions if we have data
+        if (!empty($positions)) {
+            $model = $this->getModel('Stages');
+            $model->updatePositions($positions);
+            $app->enqueueMessage(Text::_('COM_WORKFLOW_POSITIONS_SAVED'));
+        }
+
+        // Redirect based on task
+        switch ($task) {
+            case 'apply':
+                $this->setRedirect(
+                    Route::_('index.php?option=' . $options . '&view=graph&id=' . $workflowId . '&extension=' . $extension, false)
+                );
+                break;
+
+            default:
+                $this->setRedirect(
+                    Route::_('index.php?option=' . $options . '&view=workflows&extension=' . $extension, false)
+                );
+                break;
+        }
+
+        return true;
+    }
+
+    /**
+     * Function to apply changes to the workflow graph
+     *
+     * @return  boolean  True if successful
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    public function apply()
+    {
+        $this->save();
+
+        return true;
     }
 }

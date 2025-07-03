@@ -213,10 +213,28 @@ class StagesModel extends ListModel
      *
      * @since   4.0.0
      */
-    public function updatePositions($stages)
+    public function updatePositions($stagePositions)
     {
-        if (empty($stages)) {
-            return true;
+//        stage positions format is Array ( [4] => Array ( [x] => 880 [y] => -180 ) [5] => Array ( [x] => 1340 [y] => -160 ) [8] => Array ( [x] => 1220 [y] => 460 ) [9] => Array ( [x] => 1320 [y] => 120 ) )
+
+        if (empty($stagePositions) || !is_array($stagePositions)) {
+            $this->setError('Invalid stage positions data');
+            return false;
+        }
+
+        // Convert the stage positions to the expected format
+        $stages = [];
+        foreach ($stagePositions as $id => $position) {
+            if (isset($position['x']) && isset($position['y'])) {
+                $stages[] = [
+                    'id' => (int) $id,
+                    'x'  => (float) $position['x'],
+                    'y'  => (float) $position['y'],
+                ];
+            } else {
+                $this->setError('Invalid position data for stage ID: ' . $id);
+                return false;
+            }
         }
 
         $db = $this->getDatabase();
@@ -233,15 +251,15 @@ class StagesModel extends ListModel
                 $x = (float) $stage['x'];
                 $y = (float) $stage['y'];
 
-                // Format the position as a POINT
-                $point = "POINT($x $y)";
+                // Format the position as a text which can later converted to json
+                $point  = '{"x":' . $x . ', "y":' . $y . '}';
 
                 $query = $db->getQuery(true)
                     ->update($db->quoteName('#__workflow_stages'))
-                    ->set($db->quoteName('position') . ' = ST_GeomFromText(' . $db->quote($point) . ')')
+                    ->set($db->quoteName('position') . ' = :position')
                     ->where($db->quoteName('id') . ' = :id')
+                    ->bind(':position', $point, ParameterType::STRING)
                     ->bind(':id', $id, ParameterType::INTEGER);
-
                 $db->setQuery($query);
                 $db->execute();
             }
