@@ -47,14 +47,35 @@ class WorkflowGraphApi {
       Joomla.request({
         url: `${this.baseUrl}${url}&extension=${this.extension}`,
         ...options,
-        onSuccess: (responseText) => {
-          resolve(responseText);
-        },
-        onError: (xhr) => {
-          if (xhr.status === 303 || xhr.status === 302) {
-            resolve({ success: true, message: 'Operation completed (redirected).' });
+        onSuccess: (responseText, xhr) => {
+          const response = responseText?.trim();
+          try {
+            const parsed = JSON.parse(response);
+            resolve(parsed);
+            return;
+          } catch {
+
+          }
+          const temp = document.createElement('div');
+          temp.innerHTML = response;
+
+          const success = temp.querySelector('joomla-alert[type="success"] .alert-message');
+          if (success) {
+            resolve({ success: true, message: success.textContent.trim() });
             return;
           }
+
+          const error = temp.querySelector('joomla-alert[type="error"], joomla-alert[type="danger"], joomla-alert[type="warning"] .alert-message');
+          if (error) {
+            const msg = error.querySelector('.alert-message')?.textContent.trim() || 'An error occurred.';
+            reject(new Error(msg));
+            return;
+          }
+
+          // No message, assume okay
+          resolve({ success: true, message: 'No system message. Assuming success.', raw: response });
+        },
+        onError: (xhr) => {
           let message = 'Network error';
           try {
             const errorData = JSON.parse(xhr.responseText);
@@ -199,8 +220,7 @@ class WorkflowGraphApi {
       const data = typeof response === 'string' ? JSON.parse(response) : response;
 
       if (data.success === false) {
-        WorkflowGraph.Event.fire('onTransitionError', { error: data.message || 'Failed to delete transition' });
-        return false;
+        WorkflowGraph.Event.fire('onTransitionError', { error: data.message || 'Failed to delete transition' })
       }
 
       return true;

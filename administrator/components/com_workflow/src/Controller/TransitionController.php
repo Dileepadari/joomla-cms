@@ -195,14 +195,11 @@ class TransitionController extends FormController
         $task    = $this->getTask();
 
         if ($isModal && $result && $task === 'save') {
-            $id = $this->input->getInt('id', 0);
-            $this->setRedirect(
-                Route::_(
-                    'index.php?option=com_workflow&view=transition&layout=modalreturn&tmpl=component&workflow_id=' . $id. '&extension=' . $this->extension,
-                    false
-                )
-            );
-            return true;
+            $id     = $this->input->get('id');
+            $return = 'index.php?option=' . $this->option . '&view=' . $this->view_item . $this->getRedirectToItemAppend($id)
+                . '&layout=modalreturn&from-task=save';
+
+            $this->setRedirect(Route::_($return, false));
         }
         return $result;
     }
@@ -223,14 +220,11 @@ class TransitionController extends FormController
         $isModal = $input->get('layout') === 'modal' || $input->get('tmpl') === 'component';
 
         if ($isModal) {
-            $id = $this->input->getInt('id', 0);
-            $this->setRedirect(
-                Route::_(
-                    'index.php?option=com_workflow&view=transition&layout=modalreturn&tmpl=component&workflow_id=' . $id . '&extension='  . $this->extension,
-                    false
-                )
-            );
-            return true;
+            $id     = $this->input->get('id');
+            $return = 'index.php?option=' . $this->option . '&view=' . $this->view_item . $this->getRedirectToItemAppend($id)
+                . '&layout=modalreturn&from-task=cancel';
+
+            $this->setRedirect(Route::_($return, false));
         }
         return $result;
     }

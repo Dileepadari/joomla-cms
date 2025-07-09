@@ -118,11 +118,23 @@ export default {
 		commit('SET_ERROR', null);
 		try {
 			await workflowGraphApi.deleteTransition(id, workflowId);
+			if (window.Joomla && window.Joomla.renderMessages) {
+				window.Joomla.renderMessages({
+					success: ['Transition deleted successfully']
+				});
+			}
 		} catch (error) {
-			commit('SET_ERROR', error.message);
-			throw error;
+			const errorMessage = error.message || 'Failed to delete transition';
+			commit('SET_ERROR', errorMessage);
+
+			if (window.Joomla && window.Joomla.renderMessages) {
+				window.Joomla.renderMessages({
+					error: [errorMessage]
+				});
+			}
 		} finally {
 			commit('SET_LOADING', false);
+			await dispatch('loadWorkflow', workflowId);
 		}
 	},
 

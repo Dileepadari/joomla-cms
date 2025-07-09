@@ -96,7 +96,6 @@ export default {
     const liveRegion = ref(null);
     const saveStatus = ref('upToDate');
     const previouslyFocusedElement = ref(null);
-    const deleteModal = ref({ visible: false, type: '', id: null, title: '', message: '' });
 
     const stages = computed(() => store.getters.stages || []);
     const transitions = computed(() => store.getters.transitions || []);
@@ -295,7 +294,6 @@ export default {
       positionedNodes,
       styledEdges,
       liveRegion,
-      deleteModal,
       isTransitionMode,
       handleConnect,
       selectEdge,
