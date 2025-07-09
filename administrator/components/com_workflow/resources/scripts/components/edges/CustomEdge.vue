@@ -3,6 +3,7 @@
     <path
       :d="edgePath"
       fill="none"
+      role="button"
       :stroke="style?.stroke || '#333'"
       :stroke-width="style?.strokeWidth || 2"
       :stroke-dasharray="style?.strokeDasharray"
@@ -22,13 +23,13 @@
       @blur="onEdgeBlur"
     >
       <div class="d-flex align-items-center border text-bg-info rounded shadow-sm px-2 py-1 gap-1">
-        <span
-          class="text-truncate text-center flex-grow-1 fw-semibold"
+        <h3
+          class="h3 text-truncate text-center flex-grow-1 fw-semibold"
           :style="{ maxWidth: data?.isTransitionMode ? '80px' : '100%' }"
           :title="data?.title"
         >
           {{ data?.title }}
-        </span>
+        </h3>
         <button
           @click.stop="data?.onEdit?.()"
           class="btn btn-lg btn-secondary py-0 px-1"

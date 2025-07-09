@@ -21,7 +21,7 @@
     <!-- Stage Header -->
     <div class="card-header d-flex justify-content-between align-items-start p-1">
       <div class="flex-fill w-75">
-        <h3 class="card-title mb-1 fw-semibold" :title="stage?.title">{{ stage.title }}</h3>
+        <h2 class="h3 card-title mb-1 fw-semibold" :title="stage?.title">{{ stage.title }}</h2>
         <p class="card-text text-muted mb-0 text-truncate" :title="stage?.description">{{ stage.description }}</p>
       </div>
 

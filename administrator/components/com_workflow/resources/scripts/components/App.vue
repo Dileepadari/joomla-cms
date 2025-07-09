@@ -4,26 +4,16 @@
       class="workflow-app-container d-flex flex-column flex-grow-1 min-vh-80"
       role="application"
       aria-label="appTitle">
-      <div
-        aria-live="polite"
-        aria-atomic="true"
-        class="sr-only"
-        ref="ariaLive"
-      ></div>
-      <h1 id="appTitle" class="visually-hidden">
-        {{ translate('COM_WORKFLOW_GRAPH_TITLE') }}
-      </h1>
       <div class="d-flex flex-column flex-shrink-0" role="banner">
         <WorkflowTitlebar
           :save-status="saveStatus"
         />
       </div>
       <div class="d-flex flex-grow-1 overflow-hidden">
-        <main
+        <div
           class="flex-grow-1 position-relative"
           role="main"
           aria-labelledby="workflow-heading"
-          tabindex="-1"
           id="main-canvas"
         >
           <WorkflowCanvas
@@ -31,7 +21,7 @@
             :save-status="saveStatus"
             :set-save-status="setSaveStatus"
             @focus-request="handleCanvasFocus"          />
-        </main>
+        </div>
       </div>
     </div>
 </template>

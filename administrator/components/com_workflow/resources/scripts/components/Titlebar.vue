@@ -1,7 +1,7 @@
 <template>
   <section class="workflow-graph-titlebar d-flex flex-wrap align-items-center justify-content-between" aria-labelledby="workflow-title" role="region">
     <div class="col-md-6 d-flex flex-column">
-      <h2 class="h2 mb-2" id="workflow-title">{{ translate(workflow?.title) }}</h2>
+      <h1 class="h2 mb-2" id="workflow-title">{{ translate(workflow?.title) }}</h1>
       <dl class="d-flex align-items-center flex-wrap mb-0" aria-label="workflow details">
         <div class="me-3 mb-1 d-flex align-items-center">
           <dt class="visually-hidden">{{ translate('COM_WORKFLOW_GRAPH_STATUS') }}</dt>

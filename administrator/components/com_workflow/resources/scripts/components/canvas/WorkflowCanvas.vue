@@ -3,7 +3,6 @@
     id="main-canvas"
     class="w-100 h-100 position-relative"
     role="region"
-    tabindex="0"
     :aria-label="translate('COM_WORKFLOW_GRAPH_CANVAS_REGION')"
     ref="canvasRegion"
   >
