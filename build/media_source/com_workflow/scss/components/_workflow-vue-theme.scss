@@ -33,15 +33,15 @@
 .vue-flow__node-default,
 .vue-flow__node-input,
 .vue-flow__node-output {
-  padding: 10px;
   width: 150px;
-  border-radius: 3px;
+  padding: 10px;
   font-size: 12px;
-  text-align: center;
+  border-radius: 3px;
   color: var(--vf-node-text);
+  text-align: center;
+  background-color: var(--vf-node-bg);
   border-style: solid;
   border-width: 1px;
-  background-color: var(--vf-node-bg);
   border-color: var(--vf-node-color);
 }
 
