@@ -158,8 +158,8 @@
   box-sizing: border-box;
   pointer-events: all;
   cursor: default;
-  transform-origin: 0 0;
   user-select: none;
+  transform-origin: 0 0;
 }
 
 .vue-flow__node.draggable {
@@ -187,10 +187,10 @@
 }
 
 .vue-flow__handle {
-  min-width: 5px;
   position: absolute;
-  pointer-events: none;
+  min-width: 5px;
   min-height: 5px;
+  pointer-events: none;
 }
 
 .vue-flow__handle.connectable {

@@ -43,7 +43,7 @@
           </dt>
           <dd>
             {{ transitionsCount }} {{ transitionsCount === 1 ? translate('COM_WORKFLOW_GRAPH_TRANSITION') :
-                translate('COM_WORKFLOW_GRAPH_TRANSITIONS') }}
+              translate('COM_WORKFLOW_GRAPH_TRANSITIONS') }}
           </dd>
         </div>
       </dl>

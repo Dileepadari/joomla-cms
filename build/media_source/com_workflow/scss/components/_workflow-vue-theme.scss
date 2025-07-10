@@ -36,13 +36,13 @@
   width: 150px;
   padding: 10px;
   font-size: 12px;
-  border-radius: 3px;
   color: var(--vf-node-text);
   text-align: center;
   background-color: var(--vf-node-bg);
+  border-color: var(--vf-node-color);
   border-style: solid;
   border-width: 1px;
-  border-color: var(--vf-node-color);
+  border-radius: 3px;
 }
 
 .vue-flow__node-default.selected,

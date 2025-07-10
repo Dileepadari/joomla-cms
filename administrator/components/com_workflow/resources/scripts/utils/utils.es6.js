@@ -41,7 +41,7 @@ export function getEdgeColor(transition, isSelected) {
  */
 export function debounce(func, delay) {
   let timer;
-  return function debounced (...args) {
+  return function debounced(...args) {
     clearTimeout(timer);
     timer = setTimeout(() => func.apply(this, args), delay);
   };

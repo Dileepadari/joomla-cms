@@ -1,5 +1,5 @@
 import {
-  announce, cycleFocus, cycleMode
+  announce, cycleFocus, cycleMode,
 } from './focus-utils.es6';
 
 /**
@@ -45,7 +45,7 @@ export function setupGlobalShortcuts({
       const moveBy = fast ? 20 : 5;
       if (!store) return;
 
-      const stageIndex = store.getters.stages.findIndex((s) => s.id === parseInt(stageId, 0));
+      const stageIndex = store.getters.stages.findIndex((s) => s.id === parseInt(stageId, 10));
       if (stageIndex === -1) return;
       const currentPosition = store.getters.stages[stageIndex].position || { x: 0, y: 0 };
       if (!currentPosition) return;

@@ -35,14 +35,14 @@
 
 /* ───── Edge Labels ───── */
 .vue-flow__edge-label {
+  padding: 4px 8px;
   font-size: 12px;
   font-weight: 500;
-  background: var(--white);
-  padding: 4px 8px;
-  border: 1px solid var(--border);
   pointer-events: all;
-  border-radius: 4px;
   cursor: pointer;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 4px;
 }
 
 .vue-flow__edge-label:hover {
@@ -147,17 +147,17 @@ button:focus {
 }
 
 .custom-controls-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 32px;
   height: 32px;
   padding: 0;
   color: var(--primary);
-  background-color: var(--bg-normal);
-  display: flex;
-  border: 1px solid var(--border);
-  align-items: center;
-  border-radius: 4px;
-  justify-content: center;
   cursor: pointer;
+  background-color: var(--bg-normal);
+  border: 1px solid var(--border);
+  border-radius: 4px;
 }
 
 .custom-controls-button:hover {

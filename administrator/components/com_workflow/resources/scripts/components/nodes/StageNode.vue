@@ -7,8 +7,8 @@
     :data-stage-id="stage?.id"
     role="button"
     :aria-label="`${translate('COM_WORKFLOW_GRAPH_STAGE')} :
-      ${stage?.title}. ${stage?.published ? translate('WORKFLOW_GRAPH_ENABLED') :
-        translate('WORKFLOW_GRAPH_DISABLED')}`"
+    ${stage?.title}. ${stage?.published ? translate('WORKFLOW_GRAPH_ENABLED') :
+    translate('WORKFLOW_GRAPH_DISABLED')}`"
     @keydown="onNodeKeydown"
     @focus="onNodeFocus"
     @blur="onNodeBlur"

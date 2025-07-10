@@ -1,8 +1,8 @@
 <template>
   <div
     id="main-canvas"
-    class="w-100 h-100 position-relative"
     ref="canvasRegion"
+    class="w-100 h-100 position-relative"
     role="region"
     :aria-label="translate('COM_WORKFLOW_GRAPH_CANVAS_REGION')"
   >
@@ -73,7 +73,7 @@ import ControlsPanel from './ControlsPanel.vue';
 import { announce, setupDialogFocusHandlers } from '../../utils/focus-utils.es6.js';
 import { generatePositionedNodes, createSpecialNode } from '../../utils/positioning.es6.js';
 import { generateStyledEdges } from '../../utils/edges.es6.js';
-import { setupGlobalShortcuts } from '../../utils/KeyboardManager.es6.js';
+import { setupGlobalShortcuts } from '../../utils/keyboard-manager.es6.js';
 import { debounce } from '../../utils/utils.es6';
 
 export default {
@@ -238,12 +238,10 @@ export default {
       if (response) {
         saveStatus.value = 'upToDate';
         updateSaveMessage();
-      } else {
-        if (window.Joomla && window.Joomla.renderMessages) {
-          window.Joomla.renderMessages({
-            error: ['Failed to save stage position:', response?.error || 'Unknown error'],
-          });
-        }
+      } else if (window.Joomla && window.Joomla.renderMessages) {
+        window.Joomla.renderMessages({
+          error: ['Failed to save stage position:', response?.error || 'Unknown error'],
+        });
       }
     }, 3000);
 

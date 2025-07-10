@@ -85,7 +85,8 @@ export default {
       }
 
       const stageDelete = state.stages.find(
-        (s) => s.id.toString() === id).published === -1 ? 1 : 0;
+        (s) => s.id.toString() === id,
+      ).published === -1 ? 1 : 0;
 
       await workflowGraphApi.deleteStage(id, workflowId, stageDelete);
       if (window.Joomla && window.Joomla.renderMessages) {

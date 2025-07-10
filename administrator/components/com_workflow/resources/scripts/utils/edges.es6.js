@@ -19,9 +19,14 @@ export function generateStyledEdges(transitions, options = {}) {
     const targetId = String(transition.to_stage_id);
 
     const isSelected = transition.id === selectedId;
-    const isBiDirectional = transitions.some((t) => {
-      return t.from_stage_id === transition.to_stage_id && t.to_stage_id === transition.from_stage_id;
-    });
+    const isBiDirectional = transitions.some(
+      (t) => t.from_stage_id === transition.to_stage_id && t.to_stage_id === transition.from_stage_id,
+    );
+
+    let offsetIndex = 0;
+    if (isBiDirectional) {
+      offsetIndex = transition.from_stage_id > transition.to_stage_id ? 1 : -1;
+    }
 
     const edgeColor = getEdgeColor(transition, isSelected);
     const strokeWidth = isSelected ? 7 : 3;
@@ -49,9 +54,7 @@ export function generateStyledEdges(transitions, options = {}) {
         isTransitionMode: transitionMode,
         isSelected,
         isBiDirectional,
-        offsetIndex: isBiDirectional
-          ? (transition.from_stage_id > transition.to_stage_id ? 1 : -1)
-            : 0,
+        offsetIndex,
         onEdit: () => {},
         onDelete: () => {},
       },

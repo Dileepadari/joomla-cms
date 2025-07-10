@@ -142,7 +142,7 @@ export function setupDialogFocusHandlers(previouslyFocusedElement, store) {
       }
 
       dialog.addEventListener('close', () => {
-          handleDialogClose(previouslyFocusedElement, store);
+        handleDialogClose(previouslyFocusedElement, store);
       });
       dialog.addEventListener('keydown', handleDialogKeydown);
     }
