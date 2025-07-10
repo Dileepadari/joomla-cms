@@ -5,7 +5,7 @@
  * @returns {string} HSL color string.
  */
 export function getColorForStage(stage) {
-  const hue = parseInt(stage?.id, 10) * 137 % 360;
+  const hue = (parseInt(stage?.id, 10) * 137) % 360;
   return `hsl(${hue}, 70%, 85%)`;
 }
 
@@ -16,7 +16,7 @@ export function getColorForStage(stage) {
  * @returns {string} HSL color string.
  */
 export function getColorForTransition(transition) {
-  const hue = parseInt(transition?.id, 10) * 199 % 360;
+  const hue = (parseInt(transition?.id, 10) * 199) % 360;
   return `hsl(${hue}, 70%, 60%)`;
 }
 
@@ -41,7 +41,7 @@ export function getEdgeColor(transition, isSelected) {
  */
 export function debounce(func, delay) {
   let timer;
-  return function (...args) {
+  return function debounced (...args) {
     clearTimeout(timer);
     timer = setTimeout(() => func.apply(this, args), delay);
   };

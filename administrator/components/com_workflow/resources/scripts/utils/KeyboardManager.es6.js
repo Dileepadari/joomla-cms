@@ -1,4 +1,6 @@
-  import { announce, cycleFocus, cycleMode } from './focus-utils.es6';
+import {
+  announce, cycleFocus, cycleMode
+} from './focus-utils.es6';
 
 /**
  * Attach global keyboard listeners for workflow canvas.
@@ -10,19 +12,18 @@
  * @param {Function} toggleMode
  * @param {Function} undo
  * @param {Function} redo
- *
  * @param {Function} clearSelection
  * @param {Function} zoomIn
  * @param {Function} zoomOut
  *
  * @param {Object} state - { selectedStage, selectedTransition, isTransitionMode, liveRegion }
  */
-export function setupGlobalShortcuts({ addStage, addTransition, editItem, deleteItem,
-                                       toggleMode, undo, redo, updateSaveMessage,
-                                       saveNodePosition, clearSelection, zoomIn,
-                                       zoomOut, fitView, viewport, state, setSaveStatus, store
-                                     }) {
-
+export function setupGlobalShortcuts({
+  addStage, addTransition, editItem, deleteItem,
+  toggleMode, undo, redo, updateSaveMessage,
+  saveNodePosition, clearSelection, zoomIn,
+  zoomOut, fitView, viewport, state, setSaveStatus, store,
+}) {
   function isModifierPressed(e, key) {
     return (e.ctrlKey || e.metaKey) && [key.toLowerCase(), key.toUpperCase()].includes(e.key);
   }
@@ -36,6 +37,36 @@ export function setupGlobalShortcuts({ addStage, addTransition, editItem, delete
       }
       return;
     }
+
+    function moveNode(stageId, direction, fast = false) {
+      const el = document.querySelector(`.stage-node[data-stage-id='${stageId}']`);
+      if (!el) return;
+
+      const moveBy = fast ? 20 : 5;
+      if (!store) return;
+
+      const stageIndex = store.getters.stages.findIndex((s) => s.id === parseInt(stageId, 0));
+      if (stageIndex === -1) return;
+      const currentPosition = store.getters.stages[stageIndex].position || { x: 0, y: 0 };
+      if (!currentPosition) return;
+
+      let newX = currentPosition.x;
+      let newY = currentPosition.y;
+
+      switch (direction) {
+        case 'ArrowUp': newY -= moveBy; break;
+        case 'ArrowDown': newY += moveBy; break;
+        case 'ArrowLeft': newX -= moveBy; break;
+        case 'ArrowRight': newX += moveBy; break;
+        default: break;
+      }
+
+      store.dispatch('updateStagePosition', { id: stageId, x: newX, y: newY });
+      setSaveStatus('unsaved');
+      updateSaveMessage();
+      saveNodePosition();
+    }
+
     switch (true) {
       case e.altKey && ['n', 'N'].includes(e.key):
         e.preventDefault();
@@ -90,7 +121,7 @@ export function setupGlobalShortcuts({ addStage, addTransition, editItem, delete
         break;
 
       case ['f', 'F'].includes(e.key):
-        e.preventDefault()
+        e.preventDefault();
         fitView();
         break;
 
@@ -103,15 +134,16 @@ export function setupGlobalShortcuts({ addStage, addTransition, editItem, delete
         e.preventDefault();
         if (state.selectedStage.value) {
           moveNode(state.selectedStage.value.toString(), e.key, e.shiftKey);
-        }else if(e.shiftKey){
+        } else if (e.shiftKey) {
           const panStep = 20;
           switch (e.key) {
             case 'ArrowUp': viewport.value.y += panStep; break;
             case 'ArrowDown': viewport.value.y -= panStep; break;
             case 'ArrowLeft': viewport.value.x += panStep; break;
             case 'ArrowRight': viewport.value.x -= panStep; break;
+            default: break;
           }
-        }else{
+        } else {
           const reverse = ['ArrowLeft', 'ArrowUp'].includes(e.key);
           const groupSelectors = {
             stages: '.stage-node[tabindex="0"]',
@@ -119,43 +151,19 @@ export function setupGlobalShortcuts({ addStage, addTransition, editItem, delete
             toolbar: '.toolbar-button[tabindex="0"]',
             actions: '.action-button[tabindex="0"]',
             links: 'a[href][tabindex="0"], a[href]:not([tabindex="-1"])',
-            buttons: 'button[tabindex="0"], button:not([tabindex="-1"])'
+            buttons: 'button[tabindex="0"], button:not([tabindex="-1"])',
           };
           const selector = groupSelectors[state.currentFocusMode.value];
           if (selector) {
             cycleFocus(selector, reverse);
-          }          break;
+          }
+          break;
         }
         break;
+
+      default:
+        break;
     }
-  }
-
-  function moveNode(stageId, direction, fast = false) {
-    const el = document.querySelector(`.stage-node[data-stage-id='${stageId}']`);
-    if (!el) return;
-
-    const moveBy = fast ? 20 : 5;
-    if (!store) return;
-
-    const stageIndex = store.getters.stages.findIndex(s => s.id === parseInt(stageId));
-    if (stageIndex === -1) return;
-    const currentPosition = store.getters.stages[stageIndex].position || { x: 0, y: 0 };
-    if (!currentPosition) return;
-
-    let newX = currentPosition.x;
-    let newY = currentPosition.y;
-
-    switch (direction) {
-      case 'ArrowUp': newY -= moveBy; break;
-      case 'ArrowDown': newY += moveBy; break;
-      case 'ArrowLeft': newX -= moveBy; break;
-      case 'ArrowRight': newX += moveBy; break;
-    }
-
-    store.dispatch('updateStagePosition', { id: stageId, x: newX, y: newY });
-    setSaveStatus('unsaved');
-    updateSaveMessage();
-    saveNodePosition();
   }
 
   document.addEventListener('keydown', handleKey);

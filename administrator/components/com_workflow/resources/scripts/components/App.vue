@@ -5,8 +5,9 @@
     role="application"
     aria-label="appTitle"
   >
-    <div class="d-flex flex-column flex-shrink-0"
-         role="banner"
+    <div
+      class="d-flex flex-column flex-shrink-0"
+      role="banner"
     >
       <WorkflowTitlebar
         :save-status="saveStatus"

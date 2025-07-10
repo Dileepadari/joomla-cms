@@ -1,4 +1,4 @@
-import { getColorForStage } from "./utils.es6.js"
+import { getColorForStage } from './utils.es6.js';
 
 /**
  * Calculate and return positioned stage nodes in a grid layout.
@@ -11,7 +11,7 @@ export function generatePositionedNodes(stages, options = {}) {
     gapX = 400,
     gapY = 300,
     paddingX = 100,
-    paddingY = 100
+    paddingY = 100,
   } = options;
 
   const columns = Math.min(4, Math.ceil(Math.sqrt(stages?.length || 0)) + 1);
@@ -22,7 +22,7 @@ export function generatePositionedNodes(stages, options = {}) {
 
     const position = stage?.position || {
       x: col * gapX + paddingX,
-      y: row * gapY + paddingY
+      y: row * gapY + paddingY,
     };
 
     return {
@@ -32,14 +32,14 @@ export function generatePositionedNodes(stages, options = {}) {
       data: {
         stage: {
           ...stage,
-          color: stage?.color || getColorForStage(stage)
+          color: stage?.color || getColorForStage(stage),
         },
         isSelected: false,
         onSelect: () => {},
         onEdit: () => {},
-        onDelete: () => {}
+        onDelete: () => {},
       },
-      draggable: true
+      draggable: true,
     };
   });
 }
@@ -63,11 +63,11 @@ export function createSpecialNode(id, position, color, label, onSelect = () => {
         id,
         title: label,
         published: true,
-        color
+        color,
       },
       isSpecial: true,
-      onSelect
+      onSelect,
     },
-    draggable
+    draggable,
   };
 }

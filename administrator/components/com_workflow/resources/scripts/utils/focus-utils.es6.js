@@ -60,30 +60,14 @@ export function cycleMode(focusModes, currentModeRef, liveRegionElement) {
   announce(liveRegionElement, `Focus mode: ${focusModes[nextIndex]}`);
 }
 
-
 /**
+ * Handle focus and keyboard events for dialog iframes.
+ * This function sets focus to the first input or body of the iframe,
+ * and adds an Escape key listener to close the dialog.
  *
+ * @param {HTMLIFrameElement} iframe - The iframe element to handle.
  *
  */
-export function setupDialogFocusHandlers(previouslyFocusedElement, store) {
-  setTimeout(() => {
-    const dialog = document.querySelector('joomla-dialog dialog[open]');
-    if (dialog) {
-      dialog.focus();
-      const iframe = dialog.querySelector('iframe');
-      if (iframe) {
-        iframe.addEventListener('load', () => {
-          handleDialogIframeLoad(iframe);
-        });
-      }
-
-      dialog.addEventListener('close', () =>
-        handleDialogClose(previouslyFocusedElement, store)
-      );
-      dialog.addEventListener('keydown', handleDialogKeydown);
-    }
-  }, 100);
-}
 function handleDialogIframeLoad(iframe) {
   try {
     iframe.focus();
@@ -105,20 +89,29 @@ function handleDialogIframeLoad(iframe) {
           }
         }
       });
-
     }
   } catch (error) {
     iframe.focus();
   }
 }
 
+/**
+ * Handle dialog close event.
+ * @param previouslyFocusedElement
+ * @param store
+ */
 function handleDialogClose(previouslyFocusedElement, store) {
   if (previouslyFocusedElement.value) {
-      previouslyFocusedElement.value.focus();
-      previouslyFocusedElement.value = null;
+    previouslyFocusedElement.value.focus();
+    previouslyFocusedElement.value = null;
   }
   store.dispatch('loadWorkflow', store.getters.workflowId);
 }
+
+/**
+ * Handle Escape keydown event on dialog.
+ * @param e
+ */
 function handleDialogKeydown(e) {
   if (e.key === 'Escape') {
     e.preventDefault();
@@ -127,4 +120,31 @@ function handleDialogKeydown(e) {
       dialog.close();
     }
   }
+}
+
+/**
+ * Setup focus handlers for dialog iframes.
+ * This function will focus the dialog and handle iframe loading and closing.
+ *
+ * @param {Ref<HTMLElement>} previouslyFocusedElement - Ref to store the previously focused element.
+ * @param {Object} store - Vuex store instance.
+ */
+export function setupDialogFocusHandlers(previouslyFocusedElement, store) {
+  setTimeout(() => {
+    const dialog = document.querySelector('joomla-dialog dialog[open]');
+    if (dialog) {
+      dialog.focus();
+      const iframe = dialog.querySelector('iframe');
+      if (iframe) {
+        iframe.addEventListener('load', () => {
+          handleDialogIframeLoad(iframe);
+        });
+      }
+
+      dialog.addEventListener('close', () => {
+          handleDialogClose(previouslyFocusedElement, store);
+      });
+      dialog.addEventListener('keydown', handleDialogKeydown);
+    }
+  }, 100);
 }

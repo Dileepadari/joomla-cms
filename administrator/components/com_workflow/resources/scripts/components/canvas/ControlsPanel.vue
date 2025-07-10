@@ -1,7 +1,8 @@
 <template>
-  <Panel position="top-left"
-         aria-label="Workflow actions"
-         class="d-flex gap-2 p-2"
+  <Panel
+    position="top-left"
+    aria-label="Workflow actions"
+    class="d-flex gap-2 p-2"
   >
     <button
       class="toolbar-button btn btn-primary d-flex align-items-center gap-1"
@@ -9,8 +10,9 @@
       :aria-label="translate('COM_WORKFLOW_GRAPH_ADD_STAGE')"
       @click="$emit('add-stage')"
     >
-      <span class="icon icon-plus"
-            aria-hidden="true"
+      <span
+        class="icon icon-plus"
+        aria-hidden="true"
       />
       {{ translate('COM_WORKFLOW_GRAPH_ADD_STAGE') }}
     </button>
@@ -21,8 +23,9 @@
       :aria-label="translate('COM_WORKFLOW_GRAPH_ADD_TRANSITION')"
       @click="$emit('add-transition')"
     >
-      <span class="icon icon-plus"
-            aria-hidden="true"
+      <span
+        class="icon icon-plus"
+        aria-hidden="true"
       />
       {{ translate('COM_WORKFLOW_GRAPH_ADD_TRANSITION') }}
     </button>
@@ -34,8 +37,10 @@
       :aria-label="isTransitionMode ? translate('COM_WORKFLOW_GRAPH_EXIT_TRANSITION_MODE') : translate('COM_WORKFLOW_GRAPH_ENTER_TRANSITION_MODE')"
       @click="$emit('toggle-transition-mode')"
     >
-      <span :class="isTransitionMode ? 'icon icon-toggle-on' : 'icon icon-toggle-off'"
-            aria-hidden="true" />
+      <span
+        :class="isTransitionMode ? 'icon icon-toggle-on' : 'icon icon-toggle-off'"
+        aria-hidden="true"
+      />
       {{ isTransitionMode ? translate('COM_WORKFLOW_GRAPH_EXIT_TRANSITION_MODE') : translate('COM_WORKFLOW_GRAPH_ENTER_TRANSITION_MODE') }}
     </button>
   </Panel>
@@ -53,6 +58,6 @@ export default {
       default: false,
     },
   },
-  emits: ['add-stage', 'add-transition', 'toggle-transition-mode']
+  emits: ['add-stage', 'add-transition', 'toggle-transition-mode'],
 };
 </script>

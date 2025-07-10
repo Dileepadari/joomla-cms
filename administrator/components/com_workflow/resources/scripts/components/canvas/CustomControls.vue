@@ -1,7 +1,8 @@
 <template>
-  <div class="custom-controls"
-       tabindex="0"
-       ref="controlsContainer"
+  <div
+    ref="controlsContainer"
+    class="custom-controls"
+    tabindex="0"
   >
     <button
       class="toolbar-button custom-controls-button"

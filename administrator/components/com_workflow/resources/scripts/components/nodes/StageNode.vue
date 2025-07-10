@@ -8,7 +8,7 @@
     role="button"
     :aria-label="`${translate('COM_WORKFLOW_GRAPH_STAGE')} :
       ${stage?.title}. ${stage?.published ? translate('WORKFLOW_GRAPH_ENABLED') :
-      translate('WORKFLOW_GRAPH_DISABLED')}`"
+        translate('WORKFLOW_GRAPH_DISABLED')}`"
     @keydown="onNodeKeydown"
     @focus="onNodeFocus"
     @blur="onNodeBlur"
@@ -39,21 +39,24 @@
     <!-- Stage Header -->
     <div class="card-header d-flex justify-content-between align-items-start p-1">
       <div class="flex-fill w-75 me-3 min-width-0">
-        <h2 class="h3 card-title mb-1 fw-semibold text-truncate"
-            :title="stage?.title"
+        <h2
+          class="h3 card-title mb-1 fw-semibold text-truncate"
+          :title="stage?.title"
         >
           {{ stage.title }}
         </h2>
-        <p class="card-text text-muted mb-0 text-truncate"
-           :title="stage?.description"
+        <p
+          class="card-text text-muted mb-0 text-truncate"
+          :title="stage?.description"
         >
           {{ stage.description }}
         </p>
       </div>
 
       <!-- Actions -->
-      <div class="stage-card-actions align-items-center"
-           :class="data?.isSpecial ? 'd-none' : 'd-flex'"
+      <div
+        class="stage-card-actions align-items-center"
+        :class="data?.isSpecial ? 'd-none' : 'd-flex'"
       >
         <button
           class="btn btn-lg btn-secondary py-0 px-1 me-2"
@@ -61,8 +64,9 @@
           :title="translate('COM_WORKFLOW_GRAPH_EDIT_STAGE')"
           @click.stop="data.onEdit"
         >
-          <i class="icon icon-pencil"
-             aria-hidden="true"
+          <i
+            class="icon icon-pencil"
+            aria-hidden="true"
           />
         </button>
         <button
@@ -71,8 +75,9 @@
           :title="translate('COM_WORKFLOW_GRAPH_DELETE_STAGE')"
           @click.stop="data.onDelete"
         >
-          <i class="icon icon-trash"
-             aria-hidden="true"
+          <i
+            class="icon icon-trash"
+            aria-hidden="true"
           />
         </button>
       </div>
@@ -119,6 +124,7 @@ export default {
       required: true,
     },
   },
+  emits: ['navigate'],
   computed: {
     Position() {
       return Position;
@@ -166,6 +172,5 @@ export default {
     },
     onNodeBlur() {},
   },
-  emits: ['navigate']
 };
 </script>

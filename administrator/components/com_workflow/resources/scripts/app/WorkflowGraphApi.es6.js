@@ -1,9 +1,7 @@
 /**
  * Handles API communication for the workflow graph.
  */
-
 class WorkflowGraphApi {
-
   /**
    * Initializes the WorkflowGraphApi instance.
    *
@@ -59,7 +57,7 @@ class WorkflowGraphApi {
 
             const success = temp.querySelector('joomla-alert[type="success"] .alert-message');
             if (success) {
-              resolve({success: true, message: success.textContent.trim()});
+              resolve({ success: true, message: success.textContent.trim() });
               return;
             }
 
@@ -70,7 +68,7 @@ class WorkflowGraphApi {
               return;
             }
 
-            resolve({success: true, message: 'No system message. Assuming success.', raw: response});
+            resolve({ success: true, message: 'No system message. Assuming success.', raw: response });
           }
         },
         onError: (xhr) => {

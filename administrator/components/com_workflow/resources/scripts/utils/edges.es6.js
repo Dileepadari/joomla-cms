@@ -1,4 +1,4 @@
-import { getEdgeColor} from "./utils.es6.js";
+import { getEdgeColor } from './utils.es6.js';
 
 /**
  * Generate styled edges based on transition data.
@@ -11,19 +11,19 @@ import { getEdgeColor} from "./utils.es6.js";
 export function generateStyledEdges(transitions, options = {}) {
   const {
     transitionMode = false,
-    selectedId = null
+    selectedId = null,
   } = options;
 
-  return transitions.map(transition => {
+  return transitions.map((transition) => {
     const sourceId = transition.from_stage_id === -1 ? 'from_any' : String(transition.from_stage_id);
     const targetId = String(transition.to_stage_id);
 
     const isSelected = transition.id === selectedId;
-    const isBiDirectional = transitions.some(t =>
-      t.from_stage_id === transition.to_stage_id && t.to_stage_id === transition.from_stage_id
-    );
+    const isBiDirectional = transitions.some((t) => {
+      return t.from_stage_id === transition.to_stage_id && t.to_stage_id === transition.from_stage_id;
+    });
 
-    const edgeColor = getEdgeColor(transition, isSelected)
+    const edgeColor = getEdgeColor(transition, isSelected);
     const strokeWidth = isSelected ? 7 : 3;
 
     return {
@@ -36,13 +36,13 @@ export function generateStyledEdges(transitions, options = {}) {
         stroke: edgeColor,
         strokeWidth,
         strokeDasharray: transition.published ? undefined : '5,5',
-        zIndex: isSelected ? 1000 : 1
+        zIndex: isSelected ? 1000 : 1,
       },
       markerEnd: {
         type: 'arrow',
         width: 20,
         height: 20,
-        color: edgeColor
+        color: edgeColor,
       },
       data: {
         ...transition,
@@ -50,12 +50,12 @@ export function generateStyledEdges(transitions, options = {}) {
         isSelected,
         isBiDirectional,
         offsetIndex: isBiDirectional
-          ? transition.from_stage_id > transition.to_stage_id ? 1 : -1
-          : 0,
+          ? (transition.from_stage_id > transition.to_stage_id ? 1 : -1)
+            : 0,
         onEdit: () => {},
-        onDelete: () => {}
+        onDelete: () => {},
       },
-      draggable: !transitionMode
+      draggable: !transitionMode,
     };
   });
 }

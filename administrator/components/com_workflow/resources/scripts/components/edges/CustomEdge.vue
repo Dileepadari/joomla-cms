@@ -37,8 +37,9 @@
           :title="translate('COM_WORKFLOW_GRAPH_EDIT_TRANSITION')"
           @click.stop="data?.onEdit?.()"
         >
-          <i class="icon icon-edit"
-             aria-hidden="true"
+          <i
+            class="icon icon-edit"
+            aria-hidden="true"
           />
         </button>
         <button
@@ -103,7 +104,7 @@ export default {
     data: {
       type: Object,
       default: () => ({}),
-    }
+    },
   },
   computed: {
     edgeData() {

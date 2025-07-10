@@ -9,11 +9,10 @@ export default {
    * Load a workflow by its ID, including stages and transitions.
    * @param commit
    * @param dispatch
-   * @param state
    * @param id
    * @returns {Promise<{workflow: Object, stages: Array, transitions: Array}>}
    */
-  async loadWorkflow({ commit, dispatch, state }, id) {
+  async loadWorkflow({ commit, dispatch }, id) {
     commit('SET_LOADING', true);
     commit('SET_ERROR', null);
     try {
@@ -61,12 +60,12 @@ export default {
 
     try {
       const transitions = state.transitions.filter(
-        (t) => t.from_stage_id.toString() === id || t.to_stage_id.toString() === id
+        (t) => t.from_stage_id.toString() === id || t.to_stage_id.toString() === id,
       );
 
       if (
-        state.stages.length <= 1 ||
-        state.stages.find((s) => s.id.toString() === id).default
+        state.stages.length <= 1
+          || state.stages.find((s) => s.id.toString() === id).default
       ) {
         const errorMessage = 'COM_WORKFLOW_ERROR_STAGE_CANT_DELETED';
         commit('SET_ERROR', errorMessage);
@@ -85,8 +84,8 @@ export default {
         return;
       }
 
-      const stageDelete =
-        state.stages.find((s) => s.id.toString() === id).published === -1 ? 1 : 0;
+      const stageDelete = state.stages.find(
+        (s) => s.id.toString() === id).published === -1 ? 1 : 0;
 
       await workflowGraphApi.deleteStage(id, workflowId, stageDelete);
       if (window.Joomla && window.Joomla.renderMessages) {
@@ -166,7 +165,7 @@ export default {
           };
         }
         return acc;
-      }, {})
+      }, {}),
     );
 
     if (response) {

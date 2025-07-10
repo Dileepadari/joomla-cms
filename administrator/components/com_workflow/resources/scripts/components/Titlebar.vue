@@ -1,16 +1,19 @@
 <template>
-  <section class="workflow-graph-titlebar d-flex flex-wrap align-items-center justify-content-between"
-           aria-labelledby="workflow-title"
-           role="region"
+  <section
+    class="workflow-graph-titlebar d-flex flex-wrap align-items-center justify-content-between"
+    aria-labelledby="workflow-title"
+    role="region"
   >
     <div class="col-md-6 d-flex flex-column">
-      <h1 id="workflow-title"
-          class="h2 mb-2"
+      <h1
+        id="workflow-title"
+        class="h2 mb-2"
       >
         {{ translate(workflow?.title) }}
       </h1>
-      <dl class="d-flex align-items-center flex-wrap mb-0"
-          aria-label="workflow details"
+      <dl
+        class="d-flex align-items-center flex-wrap mb-0"
+        aria-label="workflow details"
       >
         <div class="me-3 mb-1 d-flex align-items-center">
           <dt class="visually-hidden">
@@ -40,7 +43,7 @@
           </dt>
           <dd>
             {{ transitionsCount }} {{ transitionsCount === 1 ? translate('COM_WORKFLOW_GRAPH_TRANSITION') :
-            translate('COM_WORKFLOW_GRAPH_TRANSITIONS') }}
+                translate('COM_WORKFLOW_GRAPH_TRANSITIONS') }}
           </dd>
         </div>
       </dl>

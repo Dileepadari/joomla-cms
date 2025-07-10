@@ -2,8 +2,8 @@
   <div
     id="main-canvas"
     class="w-100 h-100 position-relative"
-    role="region"
     ref="canvasRegion"
+    role="region"
     :aria-label="translate('COM_WORKFLOW_GRAPH_CANVAS_REGION')"
   >
     <VueFlow
@@ -47,17 +47,18 @@
         @toggle-transition-mode="toggleTransitionMode"
       />
     </VueFlow>
-    <div ref="liveRegion"
-         aria-live="polite"
-         role="status"
-         class="visually-hidden"
+    <div
+      ref="liveRegion"
+      aria-live="polite"
+      role="status"
+      class="visually-hidden"
     />
   </div>
 </template>
 
 <script>
 import {
-  ref, computed, onMounted, onUnmounted, watch
+  ref, computed, onMounted, onUnmounted, watch,
 } from 'vue';
 import { useStore } from 'vuex';
 // eslint-disable-next-line import/no-unresolved
@@ -99,7 +100,7 @@ export default {
   setup() {
     const store = useStore();
     const {
-      fitView, zoomIn, zoomOut, viewport
+      fitView, zoomIn, zoomOut, viewport,
     } = useVueFlow();
 
     const isTransitionMode = ref(false);
@@ -118,6 +119,24 @@ export default {
 
     function translate(key) {
       return Joomla.Text._(key);
+    }
+
+    function openModal(type, id = null) {
+      previouslyFocusedElement.value = document.activeElement;
+      const extension = Joomla.getOptions('com_workflow', {})?.extension || '';
+      const baseUrl = `index.php?option=com_workflow&view=${type}&workflow_id=${workflowId.value}&extension=${extension}&layout=modal&tmpl=component`;
+      const src = id ? `${baseUrl}&id=${id}` : baseUrl;
+      const textHeader = id
+        ? translate(`COM_WORKFLOW_GRAPH_EDIT_${type.toUpperCase()}`)
+        : translate(`COM_WORKFLOW_GRAPH_ADD_${type.toUpperCase()}`);
+
+      const dialog = new JoomlaDialog({
+        popupType: 'iframe',
+        textHeader,
+        src,
+      });
+      dialog.show();
+      setupDialogFocusHandlers(previouslyFocusedElement, store);
     }
 
     function selectStage(id) {
@@ -143,6 +162,21 @@ export default {
       selectedTransition.value = null;
     }
 
+    function deleteStage(id) {
+      store.dispatch('deleteStage', { id, workflowId: workflowId.value });
+      selectedStage.value = null;
+    }
+
+    function deleteTransition(id) {
+      store.dispatch('deleteTransition', { id, workflowId: workflowId.value });
+      selectedTransition.value = null;
+    }
+
+    function handleDeleteConfirm(type, id) {
+      if (type === 'stage') deleteStage(id.toString());
+      else deleteTransition(id.toString());
+    }
+
     function showDeleteModal(type, id) {
       const title = translate(type === 'stage'
         ? 'COM_WORKFLOW_GRAPH_DELETE_STAGE_TITLE'
@@ -157,39 +191,6 @@ export default {
           handleDeleteConfirm(type, id);
         }
       });
-    }
-
-    function handleDeleteConfirm(type, id) {
-      if (type === 'stage') deleteStage(id.toString());
-      else deleteTransition(id.toString());
-    }
-
-    function deleteStage(id) {
-      store.dispatch('deleteStage', { id, workflowId: workflowId.value });
-      selectedStage.value = null;
-    }
-
-    function deleteTransition(id) {
-      store.dispatch('deleteTransition', { id, workflowId: workflowId.value });
-      selectedTransition.value = null;
-    }
-
-    function openModal(type, id = null) {
-      previouslyFocusedElement.value = document.activeElement;
-      const extension = Joomla.getOptions('com_workflow', {})?.extension || '';
-      const baseUrl = `index.php?option=com_workflow&view=${type}&workflow_id=${workflowId.value}&extension=${extension}&layout=modal&tmpl=component`;
-      const src = id ? `${baseUrl}&id=${id}` : baseUrl;
-      const textHeader = id
-        ? translate(`COM_WORKFLOW_GRAPH_EDIT_${type.toUpperCase()}`)
-        : translate(`COM_WORKFLOW_GRAPH_ADD_${type.toUpperCase()}`);
-
-      const dialog = new JoomlaDialog({
-        popupType: 'iframe',
-        textHeader,
-        src,
-      });
-      dialog.show();
-      setupDialogFocusHandlers(previouslyFocusedElement, store);
     }
 
     function addStage() {
@@ -208,7 +209,7 @@ export default {
         liveRegion.value,
         isTransitionMode.value
           ? translate('COM_WORKFLOW_GRAPH_TRANSITION_MODE_ON')
-          : translate('COM_WORKFLOW_GRAPH_TRANSITION_MODE_OFF')
+          : translate('COM_WORKFLOW_GRAPH_TRANSITION_MODE_OFF'),
       );
     }
 
@@ -238,13 +239,17 @@ export default {
         saveStatus.value = 'upToDate';
         updateSaveMessage();
       } else {
-        console.error('Failed to save stage position:', response?.error || 'Unknown error');
+        if (window.Joomla && window.Joomla.renderMessages) {
+          window.Joomla.renderMessages({
+            error: ['Failed to save stage position:', response?.error || 'Unknown error'],
+          });
+        }
       }
     }, 3000);
 
     async function handleNodeDragStop({ node }) {
       if (!node || !node.id || node.id === 'from_any') return;
-      const position = store.getters.stages.find(s => s.id === parseInt(node.id, 10))?.position;
+      const position = store.getters.stages.find((s) => s.id === parseInt(node.id, 10))?.position;
       const nodePosition = node.computedPosition || position || { x: 0, y: 0 };
       const { x, y } = nodePosition;
       saveStatus.value = 'unsaved';
@@ -256,7 +261,7 @@ export default {
     const positionedNodes = computed(() => {
       const nodes = generatePositionedNodes(stages.value);
       const special = createSpecialNode('from_any', { x: 600, y: -200 }, '#EF4444', 'From Any', selectStage, isTransitionMode.value);
-      return [...nodes.map(n => ({
+      return [...nodes.map((n) => ({
         ...n,
         data: {
           ...n.data,
@@ -272,7 +277,7 @@ export default {
     const styledEdges = computed(() => generateStyledEdges(transitions.value, {
       transitionMode: isTransitionMode.value,
       selectedId: selectedTransition.value,
-    }).map(edge => ({
+    }).map((edge) => ({
       ...edge,
       data: {
         ...edge.data,
@@ -319,7 +324,7 @@ export default {
           currentFocusMode,
           liveRegion: liveRegion.value,
         },
-        setSaveStatus: val => { saveStatus.value = val; },
+        setSaveStatus: (val) => { saveStatus.value = val; },
         updateSaveMessage,
         saveNodePosition,
         store,
@@ -363,6 +368,6 @@ export default {
       clearSelection,
       handleNodeDragStop,
     };
-  }
+  },
 };
 </script>
