@@ -4,7 +4,7 @@
     ref="canvasRegion"
     class="w-100 h-100 position-relative"
     role="region"
-    :aria-label="translate('COM_WORKFLOW_GRAPH_CANVAS_REGION')"
+    :aria-label="translate('COM_WORKFLOW_GRAPH_ADD_TRANSITION')"
   >
     <VueFlow
       v-if="!loading && !error"
@@ -341,6 +341,15 @@ export default {
       saveStatus.value = 'unsaved';
       updateSaveMessage();
       saveNodePosition();
+    });
+
+    // window.WorkflowGraph.Event.fire('Error', { error: error.message });
+    window.WorkflowGraph.Event.listen('Error', (event) => {
+      if (window.Joomla && window.Joomla.renderMessages) {
+        window.Joomla.renderMessages({
+          error: [event.error.message],
+        });
+      }
     });
 
     watch([loading, error], () => {

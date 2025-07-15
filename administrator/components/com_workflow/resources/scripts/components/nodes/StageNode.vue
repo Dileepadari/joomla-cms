@@ -72,8 +72,8 @@
         <button
           class="btn btn-lg btn-danger py-0 px-1"
           :class="stage.default ? 'd-none' : ''"
-          :aria-label="translate('COM_WORKFLOW_GRAPH_DELETE_STAGE')"
-          :title="translate('COM_WORKFLOW_GRAPH_DELETE_STAGE')"
+          :aria-label="translate('COM_WORKFLOW_GRAPH_DELETE_STAGE_TITLE')"
+          :title="translate('COM_WORKFLOW_GRAPH_DELETE_STAGE_TITLE')"
           @click.stop="data.onDelete"
         >
           <i

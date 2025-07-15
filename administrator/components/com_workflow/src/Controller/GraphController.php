@@ -133,8 +133,8 @@ class GraphController extends AdminController
 
             $response = [
                 'id'          => $workflow->id,
-                'title'       => $workflow->title,
-                'description' => $workflow->description,
+                'title'       => Text::_($workflow->title),
+                'description' => Text::_($workflow->description),
                 'published'   => (bool) $workflow->published,
                 'default'     => (bool) $workflow->default,
                 'extension'   => $workflow->extension,
@@ -183,8 +183,8 @@ class GraphController extends AdminController
             foreach ($stages as $stage) {
                 $response[] = [
                     'id'          => (int) $stage->id,
-                    'title'       => $stage->title,
-                    'description' => $stage->description,
+                    'title'       => Text::_($stage->title),
+                    'description' => Text::_($stage->description),
                     'published'   => (bool) $stage->published,
                     'default'     => (bool) $stage->default,
                     'ordering'    => (int) $stage->ordering,
@@ -228,17 +228,13 @@ class GraphController extends AdminController
 
             $transitions = $model->getItems();
 
-            if (empty($transitions)) {
-                throw new \RuntimeException(Text::_('COM_WORKFLOW_GRAPH_ERROR_TRANSIITIONS_NOT_FOUND'));
-            }
-
             $response    = [];
 
             foreach ($transitions as $transition) {
                 $response[] = [
                     'id'            => (int) $transition->id,
-                    'title'         => $transition->title,
-                    'description'   => $transition->description,
+                    'title'         => Text::_($transition->title),
+                    'description'   => Text::_($transition->description),
                     'published'     => (bool) $transition->published,
                     'from_stage_id' => (int) $transition->from_stage_id,
                     'to_stage_id'   => (int) $transition->to_stage_id,
@@ -260,7 +256,7 @@ class GraphController extends AdminController
     public function publish($type = 'stage')
     {
 
-        try{
+        try {
             // Check for request forgeries
             if (!$this->checkToken('post', false)) {
                 throw new \RuntimeException(Text::_('JINVALID_TOKEN'));
@@ -278,7 +274,7 @@ class GraphController extends AdminController
             $type  = $this->input->getCmd('type');
             $value = ArrayHelper::getValue($data, $task, 0, 'int');
 
-            if(empty($type)) {
+            if (empty($type)) {
                 throw new \RuntimeException(Text::_($this->text_prefix . '_NO_ITEM_SELECTED'));
             }
 
@@ -328,7 +324,7 @@ class GraphController extends AdminController
 
     public function delete($type = 'stage')
     {
-        try{
+        try {
             // Check for request forgeries
             if (!$this->checkToken('post', false)) {
                 throw new \RuntimeException(Text::_('JINVALID_TOKEN'));

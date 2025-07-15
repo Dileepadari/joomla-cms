@@ -30,7 +30,7 @@ export default {
 
       dispatch('saveToHistory');
     } catch (error) {
-      commit('SET_ERROR', error.response?.data?.message || error.message || 'An unexpected error occurred.');
+      commit('SET_ERROR', error.response?.data?.message || error.message || 'UNEXPECTED_ERROR');
     } finally {
       commit('SET_LOADING', false);
     }
@@ -58,7 +58,7 @@ export default {
         state.stages.length <= 1
           || state.stages.find((s) => s.id.toString() === id).default
       ) {
-        const errorMessage = 'COM_WORKFLOW_ERROR_STAGE_CANT_DELETED';
+        const errorMessage = 'COM_WORKFLOW_ERROR_STAGE_DEFAULT_CANT_DELETED';
         commit('SET_ERROR', errorMessage);
         if (window.Joomla && window.Joomla.renderMessages) {
           window.Joomla.renderMessages({ error: [errorMessage] });
@@ -77,7 +77,7 @@ export default {
 
       const stageDelete = state.stages.find(
         (s) => s.id.toString() === id,
-      ).published === -1 ? true : false;
+      ).published === -1;
 
       await workflowGraphApi.deleteStage(id, workflowId, stageDelete);
     } catch (error) {
@@ -110,10 +110,10 @@ export default {
     try {
       const transitionDelete = state.transitions.find(
         (t) => t.id.toString() === id,
-      ).published === -1 ? true : false;
+      ).published === -1;
       await workflowGraphApi.deleteTransition(id, workflowId, transitionDelete);
     } catch (error) {
-      const errorMessage = error.message || 'Failed to delete transition';
+      const errorMessage = error.message || 'COM_WORKFLOW_GRAPH_DELETE_TRANSITION_FAILED';
       commit('SET_ERROR', errorMessage);
 
       if (window.Joomla && window.Joomla.renderMessages) {

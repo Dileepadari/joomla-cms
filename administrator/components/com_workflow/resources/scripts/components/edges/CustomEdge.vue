@@ -45,8 +45,8 @@
         <button
           class="btn btn-md btn-danger py-0 px-1"
           :class="data?.isTransitionMode ? 'd-block' : 'd-none'"
-          :aria-label="translate('COM_WORKFLOW_GRAPH_DELETE_TRANSITION')"
-          :title="translate('COM_WORKFLOW_GRAPH_DELETE_TRANSITION')"
+          :aria-label="translate('COM_WORKFLOW_GRAPH_DELETE_TRANSITION_TITLE')"
+          :title="translate('COM_WORKFLOW_GRAPH_DELETE_TRANSITION_TITLE')"
           @click.stop="data?.onDelete?.()"
         >
           <i

@@ -206,11 +206,9 @@ class StagesController extends AdminController
      */
     public function updateStagesPosition()
     {
-        try
-        {
+        try {
             // Check for request forgeries
-            if (!$this->checkToken('post', false))
-            {
+            if (!$this->checkToken('post', false)) {
                 throw new \RuntimeException(Text::_('JINVALID_TOKEN'));
             }
 

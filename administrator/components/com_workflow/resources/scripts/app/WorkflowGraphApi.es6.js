@@ -14,11 +14,11 @@ class WorkflowGraphApi {
     } = Joomla.getOptions('com_workflow', {});
 
     if (!apiBaseUrl) {
-      throw new TypeError('Workflow API baseUrl is not defined');
+      throw new TypeError(Joomla.Text._('COM_WORKFLOW_GRAPH_API_BASEURL_NOT_SET', 'Workflow API baseUrl is not defined'));
     }
 
     if (!extension) {
-      throw new TypeError('Workflow API extension is not defined');
+      throw new TypeError(Joomla.Text._('COM_WORKFLOW_GRAPH_ERROR_EXTENSION_NOT_SET', 'Workflow extension is not set'));
     }
 
     this.baseUrl = apiBaseUrl;
@@ -26,7 +26,7 @@ class WorkflowGraphApi {
     this.csrfToken = Joomla.getOptions('csrf.token', null);
 
     if (!this.csrfToken) {
-      throw new TypeError('CSRF token not found');
+      throw new TypeError(Joomla.Text._('COM_WORKFLOW_GRAPH_ERROR_CSRF_TOKEN_NOT_SET', 'CSRF token is not set'));
     }
   }
 
@@ -48,8 +48,8 @@ class WorkflowGraphApi {
         url: `${this.baseUrl}${url}&extension=${this.extension}`,
         ...options,
         onSuccess: (response) => {
-            const data = JSON.parse(response);
-            resolve(data);
+          const data = JSON.parse(response);
+          resolve(data);
         },
         onError: (xhr) => {
           let message = 'Network error';
@@ -59,7 +59,7 @@ class WorkflowGraphApi {
           } catch (e) {
             message = xhr.statusText || message;
           }
-          if(window.Joomla && window.Joomla.renderMessages) {
+          if (window.Joomla && window.Joomla.renderMessages) {
             window.Joomla.renderMessages({ error: [message] });
           }
           reject(new Error(message));
@@ -75,7 +75,7 @@ class WorkflowGraphApi {
    * @returns {Promise<Object|null>}
    */
   async getWorkflow(id) {
-    return await this.makeRequest(`&task=graph.getWorkflow&workflow_id=${id}&format=json`);
+    return this.makeRequest(`&task=graph.getWorkflow&workflow_id=${id}&format=json`);
   }
 
   /**
@@ -85,7 +85,7 @@ class WorkflowGraphApi {
    * @returns {Promise<Object[]|null>}
    */
   async getStages(workflowId) {
-    return await this.makeRequest(`&task=graph.getStages&workflow_id=${workflowId}&format=json`);
+    return this.makeRequest(`&task=graph.getStages&workflow_id=${workflowId}&format=json`);
   }
 
   /**
@@ -95,7 +95,7 @@ class WorkflowGraphApi {
    * @returns {Promise<Object[]|null>}
    */
   async getTransitions(workflowId) {
-    return await this.makeRequest(`&task=graph.getTransitions&workflow_id=${workflowId}&format=json`);
+    return this.makeRequest(`&task=graph.getTransitions&workflow_id=${workflowId}&format=json`);
   }
 
   /**
@@ -127,7 +127,6 @@ class WorkflowGraphApi {
           });
         }
       }
-
     } catch (error) {
       window.WorkflowGraph.Event.fire('Error', { error: error.message });
       throw error;
@@ -150,7 +149,6 @@ class WorkflowGraphApi {
       formData.append('workflow_id', workflowId);
       formData.append('type', 'transition');
       formData.append(this.csrfToken, '1');
-      formData.append('task', 'transitions.trash');
 
       const response = await this.makeRequest(`&task=${transitionDelete ? 'graph.delete' : 'graph.trash'}&workflow_id=${workflowId}&format=json`, {
         method: 'POST',
@@ -164,7 +162,6 @@ class WorkflowGraphApi {
           });
         }
       }
-
     } catch (error) {
       window.WorkflowGraph.Event.fire('Error', { error: error.message });
       throw error;
@@ -194,10 +191,7 @@ class WorkflowGraphApi {
         data: formData,
       });
 
-      if (response && response.success) {
-        return true;
-      }
-
+      return !!(response && response.success);
     } catch (error) {
       window.WorkflowGraph.Event.fire('Error', { error: error.message });
       throw error;
