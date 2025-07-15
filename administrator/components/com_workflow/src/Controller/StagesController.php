@@ -206,17 +206,26 @@ class StagesController extends AdminController
      */
     public function updateStagesPosition()
     {
-        // Check for request forgeries
-        $this->checkToken();
+        try
+        {
+            // Check for request forgeries
+            if (!$this->checkToken('post', false))
+            {
+                throw new \RuntimeException(Text::_('JINVALID_TOKEN'));
+            }
 
-        $app        = $this->app;
-        $input      = $app->input;
-        $workflowId = $input->getInt('id');
-        $positions  = $input->get('positions', [], 'array');
-        $model      = $this->getModel('Stages', 'Administrator');
+            // Check if the user has permission to publish items
+            if (!$this->app->getIdentity()->authorise('core.edit.state', $this->extension . '.workflow.' . $this->workflowId)) {
+                throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'));
+            }
 
-        $response = [];
-        try {
+            $app        = $this->app;
+            $input      = $app->input;
+            $workflowId = $input->getInt('id');
+            $positions  = $input->get('positions', [], 'array');
+            $model      = $this->getModel('Stages', 'Administrator');
+
+            $response = [];
             $success = $model->updatePositions($positions, $workflowId);
 
             $response = [
@@ -225,6 +234,7 @@ class StagesController extends AdminController
             ];
             echo new JsonResponse($response);
         } catch (\Exception $e) {
+            http_response_code(500);
             echo new JsonResponse($e->getMessage(), 'error', true);
         }
         $this->app->close();

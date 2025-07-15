@@ -17,29 +17,20 @@ export default {
     commit('SET_ERROR', null);
     try {
       // Load workflow, stages, and transitions in parallel
-      const [workflow, stages, transitions] = await Promise.all([
+      const [workflowRes, stagesRes, transitionsRes] = await Promise.all([
         workflowGraphApi.getWorkflow(id),
         workflowGraphApi.getStages(id),
         workflowGraphApi.getTransitions(id),
       ]);
 
+      commit('SET_WORKFLOW', workflowRes?.data);
+      commit('SET_STAGES', stagesRes?.data);
+      commit('SET_TRANSITIONS', transitionsRes?.data);
       commit('SET_WORKFLOW_ID', id);
-      commit('SET_WORKFLOW', workflow);
-      commit('SET_STAGES', stages);
-      commit('SET_TRANSITIONS', transitions);
 
       dispatch('saveToHistory');
     } catch (error) {
-      const errorMessage = error.message || 'Failed to load workflow';
-      commit('SET_ERROR', errorMessage);
-
-      if (window.Joomla && window.Joomla.renderMessages) {
-        window.Joomla.renderMessages({
-          error: [errorMessage],
-        });
-      }
-
-      throw error;
+      commit('SET_ERROR', error.response?.data?.message || error.message || 'An unexpected error occurred.');
     } finally {
       commit('SET_LOADING', false);
     }
@@ -86,16 +77,11 @@ export default {
 
       const stageDelete = state.stages.find(
         (s) => s.id.toString() === id,
-      ).published === -1 ? 1 : 0;
+      ).published === -1 ? true : false;
 
       await workflowGraphApi.deleteStage(id, workflowId, stageDelete);
-      if (window.Joomla && window.Joomla.renderMessages) {
-        window.Joomla.renderMessages({
-          success: ['Stage deleted successfully'],
-        });
-      }
     } catch (error) {
-      const errorMessage = error.message || 'Failed to delete stage';
+      const errorMessage = error.message;
       commit('SET_ERROR', errorMessage);
 
       if (window.Joomla && window.Joomla.renderMessages) {
@@ -115,18 +101,17 @@ export default {
    * @param dispatch
    * @param id
    * @param workflowId
+   * @param transitionDelete
    * @returns {Promise<void>}
    */
-  async deleteTransition({ commit, dispatch }, { id, workflowId }) {
+  async deleteTransition({ commit, dispatch, state }, { id, workflowId }) {
     commit('SET_LOADING', true);
     commit('SET_ERROR', null);
     try {
-      await workflowGraphApi.deleteTransition(id, workflowId);
-      if (window.Joomla && window.Joomla.renderMessages) {
-        window.Joomla.renderMessages({
-          success: ['Transition deleted successfully'],
-        });
-      }
+      const transitionDelete = state.transitions.find(
+        (t) => t.id.toString() === id,
+      ).published === -1 ? true : false;
+      await workflowGraphApi.deleteTransition(id, workflowId, transitionDelete);
     } catch (error) {
       const errorMessage = error.message || 'Failed to delete transition';
       commit('SET_ERROR', errorMessage);

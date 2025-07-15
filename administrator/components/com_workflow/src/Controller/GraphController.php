@@ -14,6 +14,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\AdminController;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\Response\JsonResponse;
+use Joomla\Utilities\ArrayHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -64,6 +65,8 @@ class GraphController extends AdminController
     {
         parent::__construct($config, $factory, $app, $input);
 
+        $this->registerTask('trash', 'publish');
+
         // If workflow id is not set try to get it from input or throw an exception
         if (empty($this->workflowId)) {
             $this->workflowId = $this->input->getInt('id');
@@ -108,6 +111,7 @@ class GraphController extends AdminController
      */
     public function getWorkflow(): void
     {
+
         try {
             $id    = $this->input->getInt('workflow_id');
             $model = $this->getModel('Workflow');
@@ -138,6 +142,7 @@ class GraphController extends AdminController
 
             echo new JsonResponse($response);
         } catch (\Exception $e) {
+            http_response_code(500);
             echo new JsonResponse($e->getMessage(), 'error', true);
         }
 
@@ -160,10 +165,19 @@ class GraphController extends AdminController
             $workflowId = $this->input->getInt('workflow_id');
             $model      = $this->getModel('Stages');
 
+            if (empty($workflowId)) {
+                throw new \InvalidArgumentException(Text::_('COM_WORKFLOW_GRAPH_ERROR_INVALID_ID'));
+            }
+
             $model->setState('filter.workflow_id', $workflowId);
             $model->setState('list.limit', 0); // Get all stages
 
             $stages   = $model->getItems();
+
+            if (empty($stages)) {
+                throw new \RuntimeException(Text::_('COM_WORKFLOW_GRAPH_ERROR_STAGES_NOT_FOUND'));
+            }
+
             $response = [];
 
             foreach ($stages as $stage) {
@@ -180,6 +194,7 @@ class GraphController extends AdminController
             }
             echo new JsonResponse($response);
         } catch (\Exception $e) {
+            http_response_code(500);
             echo new JsonResponse($e->getMessage(), 'error', true);
         }
 
@@ -199,14 +214,24 @@ class GraphController extends AdminController
      */
     public function getTransitions()
     {
+
         try {
             $workflowId = $this->input->getInt('workflow_id');
             $model      = $this->getModel('Transitions');
+
+            if (empty($workflowId)) {
+                throw new \InvalidArgumentException(Text::_('COM_WORKFLOW_GRAPH_ERROR_INVALID_ID'));
+            }
 
             $model->setState('filter.workflow_id', $workflowId);
             $model->setState('list.limit', 0);
 
             $transitions = $model->getItems();
+
+            if (empty($transitions)) {
+                throw new \RuntimeException(Text::_('COM_WORKFLOW_GRAPH_ERROR_TRANSIITIONS_NOT_FOUND'));
+            }
+
             $response    = [];
 
             foreach ($transitions as $transition) {
@@ -224,6 +249,123 @@ class GraphController extends AdminController
 
             echo new JsonResponse($response);
         } catch (\Exception $e) {
+            http_response_code(500);
+            echo new JsonResponse($e->getMessage(), 'error', true);
+        }
+
+        $this->app->close();
+    }
+
+
+    public function publish($type = 'stage')
+    {
+
+        try{
+            // Check for request forgeries
+            if (!$this->checkToken('post', false)) {
+                throw new \RuntimeException(Text::_('JINVALID_TOKEN'));
+            }
+
+            // Check if the user has permission to publish items
+            if (!$this->app->getIdentity()->authorise('core.edit.state', $this->extension . '.workflow.' . $this->workflowId)) {
+                throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'));
+            }
+
+            // Get items to publish from the request.
+            $cid   = (array) $this->input->get('cid', [], 'int');
+            $data  = ['publish' => 1, 'unpublish' => 0, 'archive' => 2, 'trash' => -2, 'report' => -3];
+            $task  = $this->getTask();
+            $type  = $this->input->getCmd('type');
+            $value = ArrayHelper::getValue($data, $task, 0, 'int');
+
+            if(empty($type)) {
+                throw new \RuntimeException(Text::_($this->text_prefix . '_NO_ITEM_SELECTED'));
+            }
+
+            // Remove zero values resulting from input filter
+            $cid = array_filter($cid);
+
+            if (empty($cid)) {
+                throw new \RuntimeException(Text::_($this->text_prefix . '_NO_ITEM_SELECTED'));
+            } else {
+                // Get the model.
+                $model = $this->getModel($type);
+
+
+                $model->publish($cid, $value);
+                $errors = $model->getErrors();
+                $ntext  = null;
+
+                if ($value === 1) {
+                    if ($errors) {
+                        echo new JsonResponse(Text::plural($this->text_prefix . '_N_ITEMS_FAILED_PUBLISHING', \count($cid)), 'error', true);
+                    } else {
+                        $ntext = $this->text_prefix . '_N_ITEMS_PUBLISHED';
+                    }
+                } elseif ($value === 0) {
+                    $ntext = $this->text_prefix . '_N_ITEMS_UNPUBLISHED';
+                } elseif ($value === 2) {
+                    $ntext = $this->text_prefix . '_N_ITEMS_ARCHIVED';
+                } else {
+                    $ntext = $this->text_prefix . '_N_ITEMS_TRASHED';
+                }
+
+                $response = [
+                    'success' => true,
+                    'message' => Text::plural($ntext, \count($cid)),
+                ];
+
+                if (\count($cid)) {
+                    echo new JsonResponse($response);
+                }
+            }
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo new JsonResponse($e->getMessage(), 'error', true);
+        }
+        $this->app->close();
+    }
+
+    public function delete($type = 'stage')
+    {
+        try{
+            // Check for request forgeries
+            if (!$this->checkToken('post', false)) {
+                throw new \RuntimeException(Text::_('JINVALID_TOKEN'));
+            }
+
+            // Get items to remove from the request.
+            $cid = (array) $this->input->get('cid', [], 'int');
+            $type  = $this->input->getCmd('type');
+
+            // Remove zero values resulting from input filter
+            $cid = array_filter($cid);
+
+            if (empty($cid)) {
+                throw new \RuntimeException(Text::_($this->text_prefix . '_NO_ITEM_SELECTED'));
+            } else {
+                // Get the model.
+                $model = $this->getModel($type);
+
+                // Remove the items.
+                if ($model->delete($cid)) {
+                    $response = [
+                        'success' => true,
+                        'message' => Text::plural($this->text_prefix . '_N_ITEMS_DELETED', \count($cid)),
+                    ];
+                } else {
+                    throw new \RuntimeException(Text::plural($this->text_prefix . '_N_ITEMS_FAILED_DELETING', \count($cid)));
+                }
+
+                if (isset($response)) {
+                    echo new JsonResponse($response);
+                }
+
+                // Invoke the postDelete method to allow for the child class to access the model.
+                $this->postDeleteHook($model, $cid);
+            }
+        } catch (\Exception $e) {
+            http_response_code(500);
             echo new JsonResponse($e->getMessage(), 'error', true);
         }
 
