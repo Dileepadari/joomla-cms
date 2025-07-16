@@ -275,45 +275,44 @@ class GraphController extends AdminController
             $value = ArrayHelper::getValue($data, $task, 0, 'int');
 
             if (empty($type)) {
-                throw new \RuntimeException(Text::_($this->text_prefix . '_NO_ITEM_SELECTED'));
+                throw new \RuntimeException(Text::_($this->text_prefix . '_' . strtoupper($type) . '_NO_ITEM_SELECTED'));
             }
 
             // Remove zero values resulting from input filter
             $cid = array_filter($cid);
 
             if (empty($cid)) {
-                throw new \RuntimeException(Text::_($this->text_prefix . '_NO_ITEM_SELECTED'));
-            } else {
-                // Get the model.
-                $model = $this->getModel($type);
+                throw new \RuntimeException(Text::_($this->text_prefix . '_' . strtoupper($type) . '_NO_ITEM_SELECTED'));
+            }
+            // Get the model.
+            $model = $this->getModel($type);
 
 
-                $model->publish($cid, $value);
-                $errors = $model->getErrors();
-                $ntext  = null;
+            $model->publish($cid, $value);
+            $errors = $model->getErrors();
+            $ntext  = null;
 
-                if ($value === 1) {
-                    if ($errors) {
-                        echo new JsonResponse(Text::plural($this->text_prefix . '_N_ITEMS_FAILED_PUBLISHING', \count($cid)), 'error', true);
-                    } else {
-                        $ntext = $this->text_prefix . '_N_ITEMS_PUBLISHED';
-                    }
-                } elseif ($value === 0) {
-                    $ntext = $this->text_prefix . '_N_ITEMS_UNPUBLISHED';
-                } elseif ($value === 2) {
-                    $ntext = $this->text_prefix . '_N_ITEMS_ARCHIVED';
+            if ($value === 1) {
+                if ($errors) {
+                    echo new JsonResponse(Text::plural($this->text_prefix . '_N_ITEMS_FAILED_PUBLISHING', \count($cid)), 'error', true);
                 } else {
-                    $ntext = $this->text_prefix . '_N_ITEMS_TRASHED';
+                    $ntext = $this->text_prefix .  '_N_ITEMS_PUBLISHED';
                 }
+            } elseif ($value === 0) {
+                $ntext = $this->text_prefix . '_N_ITEMS_UNPUBLISHED';
+            } elseif ($value === 2) {
+                $ntext = $this->text_prefix . '_N_ITEMS_ARCHIVED';
+            } else {
+                $ntext = $this->text_prefix . '_' . strtoupper($type) .'_N_ITEMS_TRASHED';
+            }
 
-                $response = [
-                    'success' => true,
-                    'message' => Text::plural($ntext, \count($cid)),
-                ];
+            $response = [
+                'success' => true,
+                'message' => Text::plural($ntext, \count($cid)),
+            ];
 
-                if (\count($cid)) {
-                    echo new JsonResponse($response);
-                }
+            if (\count($cid)) {
+                echo new JsonResponse($response);
             }
         } catch (\Exception $e) {
             http_response_code(500);
@@ -331,35 +330,32 @@ class GraphController extends AdminController
             }
 
             // Get items to remove from the request.
-            $cid = (array) $this->input->get('cid', [], 'int');
+            $cid   = (array) $this->input->get('cid', [], 'int');
             $type  = $this->input->getCmd('type');
-
-            // Remove zero values resulting from input filter
-            $cid = array_filter($cid);
+            $cid   = array_filter($cid);
 
             if (empty($cid)) {
-                throw new \RuntimeException(Text::_($this->text_prefix . '_NO_ITEM_SELECTED'));
-            } else {
-                // Get the model.
-                $model = $this->getModel($type);
-
-                // Remove the items.
-                if ($model->delete($cid)) {
-                    $response = [
-                        'success' => true,
-                        'message' => Text::plural($this->text_prefix . '_N_ITEMS_DELETED', \count($cid)),
-                    ];
-                } else {
-                    throw new \RuntimeException(Text::plural($this->text_prefix . '_N_ITEMS_FAILED_DELETING', \count($cid)));
-                }
-
-                if (isset($response)) {
-                    echo new JsonResponse($response);
-                }
-
-                // Invoke the postDelete method to allow for the child class to access the model.
-                $this->postDeleteHook($model, $cid);
+                throw new \RuntimeException(Text::_($this->text_prefix . '_' . strtoupper($type). '_NO_ITEM_SELECTED'));
             }
+            // Get the model.
+            $model = $this->getModel($type);
+
+            // Remove the items.
+            if ($model->delete($cid)) {
+                $response = [
+                    'success' => true,
+                    'message' => Text::plural($this->text_prefix . '_' . strtoupper($type) .'_N_ITEMS_DELETED', \count($cid)),
+                ];
+            } else {
+                throw new \RuntimeException(Text::plural($this->text_prefix . '_' . strtoupper($type) . '_N_ITEMS_FAILED_DELETING', \count($cid)));
+            }
+
+            if (isset($response)) {
+                echo new JsonResponse($response);
+            }
+
+            // Invoke the postDelete method to allow for the child class to access the model.
+            $this->postDeleteHook($model, $cid);
         } catch (\Exception $e) {
             http_response_code(500);
             echo new JsonResponse($e->getMessage(), 'error', true);

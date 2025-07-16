@@ -224,7 +224,7 @@ class StagesController extends AdminController
             $model      = $this->getModel('Stages', 'Administrator');
 
             $response = [];
-            $success = $model->updatePositions($positions, $workflowId);
+            $success  = $model->updatePositions($positions, $workflowId);
 
             $response = [
                 'success' => true,
