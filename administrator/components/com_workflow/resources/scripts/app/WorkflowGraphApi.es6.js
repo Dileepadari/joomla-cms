@@ -181,6 +181,10 @@ class WorkflowGraphApi {
       formData.append('workflow_id', workflowId);
       formData.append(this.csrfToken, '1');
 
+      if (positions === null || Object.keys(positions).length === 0) {
+        return true;
+      }
+
       Object.entries(positions).forEach(([id, position]) => {
         formData.append(`positions[${id}][x]`, position.x);
         formData.append(`positions[${id}][y]`, position.y);
@@ -193,7 +197,7 @@ class WorkflowGraphApi {
 
       return !!(response && response.success);
     } catch (error) {
-      window.WorkflowGraph.Event.fire('Error', { error: error.message });
+      window.WorkflowGraph.Event.fire('Error', { error });
       throw error;
     }
   }

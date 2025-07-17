@@ -156,10 +156,16 @@ export default {
         e.preventDefault();
       }
       if (e.key === 'e' || e.key === 'E') {
+        if (this.data.isSpecial) {
+          return;
+        }
         this.data.onEdit();
         e.preventDefault();
       }
       if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (this.data.isSpecial) {
+          return;
+        }
         this.data.onDelete();
         e.preventDefault();
       }

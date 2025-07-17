@@ -102,7 +102,7 @@ export default {
       fitView, zoomIn, zoomOut, viewport,
     } = useVueFlow();
 
-    const isTransitionMode = ref(false);
+    const isTransitionMode = ref(true);
     const selectedStage = ref(null);
     const selectedTransition = ref(null);
     const liveRegion = ref(null);
@@ -257,7 +257,7 @@ export default {
 
     const positionedNodes = computed(() => {
       const nodes = generatePositionedNodes(stages.value);
-      const special = createSpecialNode('from_any', { x: 600, y: -200 }, '#EF4444', 'From Any', selectStage, isTransitionMode.value);
+      const special = createSpecialNode('from_any', { x: 600, y: -200 }, '#EF4444', 'From Any', selectStage, isTransitionMode.value, true);
       return [...nodes.map((n) => ({
         ...n,
         data: {
@@ -267,7 +267,7 @@ export default {
           onEdit: () => editStage(n.id),
           onDelete: () => showDeleteModal('stage', n.id),
         },
-        draggable: !isTransitionMode.value,
+        // draggable: !isTransitionMode.value,
       })), special];
     });
 

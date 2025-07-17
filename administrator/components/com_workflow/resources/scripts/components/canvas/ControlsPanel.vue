@@ -30,19 +30,20 @@
       {{ translate('COM_WORKFLOW_GRAPH_ADD_TRANSITION') }}
     </button>
 
-    <button
-      :class="['btn toolbar-button', isTransitionMode ? 'btn-success' : 'btn-primary', 'd-flex', 'align-items-center', 'gap-1']"
-      tabindex="0"
-      :aria-pressed="isTransitionMode"
-      :aria-label="isTransitionMode ? translate('COM_WORKFLOW_GRAPH_EXIT_TRANSITION_MODE') : translate('COM_WORKFLOW_GRAPH_ENTER_TRANSITION_MODE')"
-      @click="$emit('toggle-transition-mode')"
-    >
-      <span
-        :class="isTransitionMode ? 'icon icon-toggle-on' : 'icon icon-toggle-off'"
-        aria-hidden="true"
-      />
-      {{ isTransitionMode ? translate('COM_WORKFLOW_GRAPH_EXIT_TRANSITION_MODE') : translate('COM_WORKFLOW_GRAPH_ENTER_TRANSITION_MODE') }}
-    </button>
+    <!--<button
+          :class="['btn toolbar-button', isTransitionMode ? 'btn-success' : 'btn-primary', 'd-flex', 'align-items-center', 'gap-1']"
+          tabindex="0"
+          :aria-pressed="isTransitionMode"
+          :aria-label="isTransitionMode ? translate('COM_WORKFLOW_GRAPH_EXIT_TRANSITION_MODE')
+            : translate('COM_WORKFLOW_GRAPH_ENTER_TRANSITION_MODE')"
+          @click="$emit('toggle-transition-mode')"
+        >
+          <span
+            :class="isTransitionMode ? 'icon icon-toggle-on' : 'icon icon-toggle-off'"
+            aria-hidden="true"
+          />
+          {{ isTransitionMode ? translate('COM_WORKFLOW_GRAPH_EXIT_TRANSITION_MODE') : translate('COM_WORKFLOW_GRAPH_ENTER_TRANSITION_MODE') }}
+        </button> -->
   </Panel>
 </template>
 
