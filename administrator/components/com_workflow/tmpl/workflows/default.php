@@ -101,7 +101,7 @@ $userId = $user->id;
                                 <th scope="col" class="w-10 text-center d-none d-md-table-cell">
                                     <?php echo Text::_('COM_WORKFLOW_GRAPH'); ?>
                                 </th>
-                                <th scope="col" class="w-10 d-none d-md-table-cell">
+                                <th scope="col" class="w-10 text-center d-none d-md-table-cell">
                                     <?php echo HTMLHelper::_('searchtools.sort', 'COM_WORKFLOW_ID', 'w.id', $listDirn, $listOrder); ?>
                                 </th>
                             </tr>
@@ -186,7 +186,7 @@ $userId = $user->id;
                                         <?php echo Text::_('COM_WORKFLOW_GRAPH'); ?>
                                     </div>
                                 </td>
-                                <td class="d-none d-md-table-cell">
+                                <td class="text-center d-none d-md-table-cell">
                                     <?php echo $item->id; ?>
                                 </td>
                             </tr>

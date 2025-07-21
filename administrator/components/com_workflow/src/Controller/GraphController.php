@@ -10,6 +10,7 @@
 
 namespace Joomla\Component\Workflow\Administrator\Controller;
 
+use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\AdminController;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
@@ -43,6 +44,14 @@ class GraphController extends AdminController
      * @since  __DEPLOY_VERSION__
      */
     protected $extension;
+
+    /**
+     * The component name
+     *
+     * @var    string
+     * @since  __DEPLOY_VERSION__
+     */
+    protected $component;
 
     /**
      * The section of the current extension
@@ -84,6 +93,8 @@ class GraphController extends AdminController
             $extension = $this->input->getCmd('extension');
 
             $parts = explode('.', $extension);
+
+            $component = reset($parts);
 
             $this->extension = array_shift($parts);
 
@@ -131,6 +142,9 @@ class GraphController extends AdminController
                 throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'));
             }
 
+            $canDo   = ContentHelper::getActions($this->extension, 'workflow', $workflow->id);
+            $canCreate    = $canDo->get('core.create');
+
             $response = [
                 'id'          => $workflow->id,
                 'title'       => Text::_($workflow->title),
@@ -138,6 +152,7 @@ class GraphController extends AdminController
                 'published'   => (bool) $workflow->published,
                 'default'     => (bool) $workflow->default,
                 'extension'   => $workflow->extension,
+                'canCreate'      => $canCreate,
             ];
 
             echo new JsonResponse($response);
@@ -179,8 +194,12 @@ class GraphController extends AdminController
             }
 
             $response = [];
+            $user = $this->app->getIdentity();
 
             foreach ($stages as $stage) {
+                $canEdit    = $user->authorise('core.edit', $this->extension . '.stage.' . $stage->id);
+                $canDelete  = $user->authorise('core.delete', $this->extension . '.stage.' . $stage->id);
+
                 $response[] = [
                     'id'          => (int) $stage->id,
                     'title'       => Text::_($stage->title),
@@ -188,8 +207,13 @@ class GraphController extends AdminController
                     'published'   => (bool) $stage->published,
                     'default'     => (bool) $stage->default,
                     'ordering'    => (int) $stage->ordering,
+                    'editor'      =>  $stage->editor,
                     'position'    => $stage->position ? json_decode($stage->position, true) : null,
                     'workflow_id' => $stage->workflow_id,
+                    'permissions' => [
+                        'edit'   => $canEdit,
+                        'delete' => $canDelete,
+                    ],
                 ];
             }
             echo new JsonResponse($response);
@@ -229,8 +253,12 @@ class GraphController extends AdminController
             $transitions = $model->getItems();
 
             $response    = [];
+            $user = $this->app->getIdentity();
 
             foreach ($transitions as $transition) {
+                $canEdit = $user->authorise('core.edit', $this->extension . '.transition.' . (int) $transition->id);
+                $canDelete = $user->authorise('core.delete', $this->extension . '.transition.' . (int) $transition->id);
+
                 $response[] = [
                     'id'            => (int) $transition->id,
                     'title'         => Text::_($transition->title),
@@ -240,6 +268,10 @@ class GraphController extends AdminController
                     'to_stage_id'   => (int) $transition->to_stage_id,
                     'ordering'      => (int) $transition->ordering,
                     'workflow_id'   => (int) $transition->workflow_id,
+                    'permissions'   => [
+                        'edit'   => $canEdit,
+                        'delete' => $canDelete,
+                    ],
                 ];
             }
 

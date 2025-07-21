@@ -57,6 +57,16 @@ class GraphModel extends AdminModel
         return 'workflow'; // TODO: change it to to handdle dynamically
     }
 
+    /**
+     * Method to get the form.
+     *
+     * @param   array  $data       An optional array of data for the form to interogate.
+     * @param   bool   $loadData   True if the form is to load its own data (default case), false if not.
+     *
+     * @return  mixed  A \Joomla\CMS\Form\Form object on success, false on failure.
+     *
+     * @since   __DEPLOY_VERSION__
+     */
     public function getForm($data = [], $loadData = true)
     {
         return false;

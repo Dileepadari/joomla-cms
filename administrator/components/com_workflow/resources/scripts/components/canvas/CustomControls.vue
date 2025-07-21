@@ -29,7 +29,7 @@
       title="Fit view (F key)"
       @click="customFitView"
     >
-      <i class="icon icon-grid" />
+      <i class="icon icon-expand" />
     </button>
   </div>
 </template>

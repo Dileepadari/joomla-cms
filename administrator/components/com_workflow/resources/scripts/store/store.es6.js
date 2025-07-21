@@ -17,7 +17,7 @@ export default createStore({
   plugins: [
     createPersistedState({
       key: 'workflow-graph-state',
-      paths: ['canvas', 'workflowId', 'stages', 'transitions'],
+      paths: ['workflowId', 'stages', 'transitions'],
     }),
   ],
 });

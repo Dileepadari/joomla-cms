@@ -12,8 +12,8 @@ export default {
   history: [],
   historyIndex: -1,
   canvas: {
-    zoom: 1,
-    panX: 0,
-    panY: 0,
+    zoom: null,
+    panX: null,
+    panY: null,
   },
 };

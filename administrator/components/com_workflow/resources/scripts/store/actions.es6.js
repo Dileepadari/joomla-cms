@@ -164,6 +164,17 @@ export default {
   },
 
   /**
+   * Update the canvas viewport (zoom and pan) for the workflow graph.
+   * @param commit
+   * @param zoom
+   * @param panX
+   * @param panY
+   */
+  updateCanvasViewport({ commit }, { zoom, panX, panY }) {
+    commit('SET_CANVAS_VIEWPORT', { zoom, panX, panY });
+  },
+
+  /**
    * Save the current state of the workflow to history.
    * @param commit
    * @param state

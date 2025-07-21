@@ -30,13 +30,17 @@
       />
 
       <button
-        class="btn btn-sm btn-light border position-absolute bottom-0 start-0 m-2"
-        @click="showMiniMap = !showMiniMap"
-        :aria-label="showMiniMap ? 'Hide MiniMap' : 'Show MiniMap'"
+        class="toolbar-button custom-controls-button position-absolute"
         style="z-index: 1003"
+        :style="showMiniMap ? 'bottom: 130px; left: 180px;' : 'bottom: 10px; left: 10px;'"
+        tabindex="0"
+        @click="showMiniMap = !showMiniMap"
+        :aria-label="showMiniMap ? translate('COM_WORKFLOW_GRAPH_MINIMAP_HIDE') : translate('COM_WORKFLOW_GRAPH_MINIMAP_SHOW')"
+        :title="showMiniMap ? translate('COM_WORKFLOW_GRAPH_MINIMAP_HIDE') : translate('COM_WORKFLOW_GRAPH_MINIMAP_SHOW')"
         id="toggle-minimap"
       >
-        {{ showMiniMap ? '–' : '+' }}
+        <span v-if="showMiniMap" class="fa fa-close"></span>
+        <span v-else class="icon icon-expand-2"></span>
       </button>
       <MiniMap
         v-if="showMiniMap"
@@ -67,7 +71,7 @@
 
 <script>
 import {
-  ref, computed, onMounted, onUnmounted, watch,
+  ref, computed, onMounted, onUnmounted, watch, nextTick,
 } from 'vue';
 import { useStore } from 'vuex';
 // eslint-disable-next-line import/no-unresolved
@@ -109,7 +113,7 @@ export default {
   setup() {
     const store = useStore();
     const {
-      fitView, zoomIn, zoomOut, viewport,
+      fitView, zoomIn, zoomOut, viewport, zoomTo, setViewport, onViewportChange, getViewport,
     } = useVueFlow();
 
     const isTransitionMode = ref(true);
@@ -119,14 +123,13 @@ export default {
     const saveStatus = ref('upToDate');
     const currentFocusMode = ref('links');
     const previouslyFocusedElement = ref(null);
-    const showMiniMap = ref(true);
 
+    const showMiniMap = ref(true);
     const stages = computed(() => store.getters.stages || []);
     const transitions = computed(() => store.getters.transitions || []);
     const loading = computed(() => store.getters.loading);
     const error = computed(() => store.getters.error);
     const workflowId = computed(() => store.getters.workflowId);
-
     function translate(key) {
       return Joomla.Text._(key);
     }
@@ -146,7 +149,7 @@ export default {
         src,
       });
       dialog.show();
-      setupDialogFocusHandlers(previouslyFocusedElement, store, fitView);
+      setupDialogFocusHandlers(previouslyFocusedElement, store);
     }
 
     function selectStage(id) {
@@ -375,11 +378,44 @@ export default {
       }
     });
 
+    let isRestoringViewport = false;
     watch([loading, error], () => {
       setTimeout(() => {
-        fitView({ padding: 0.5, duration: 300 });
+        if (loading.value || error.value) return;
+        const { panX, panY, zoom } = store.getters.canvas ?? {};
+
+        if (
+          typeof panX === 'number' && !Number.isNaN(panX) &&
+          typeof panY === 'number' && !Number.isNaN(panY) &&
+          typeof zoom === 'number' && !Number.isNaN(zoom)
+        ) {
+
+          isRestoringViewport = true;
+          Promise.resolve()
+            .then(() => setViewport({ x: panX, y: panY, zoom }))
+            .finally(() => {
+              isRestoringViewport = false;
+            });
+
+        } else {
+          fitView({ padding: 0.5, duration: 300 });
+        }
       }, 0);
+    }, { immediate: true });
+
+    onViewportChange(({ x, y, zoom }) => {
+      if (isRestoringViewport) {
+        return;
+      }
+
+      if ([x, y, zoom].some(v => typeof v !== 'number' || Number.isNaN(v))) {
+        return;
+      }
+      store.dispatch('updateCanvasViewport', { panX: x, panY: y, zoom });
     });
+
+
+
 
     return {
       loading,

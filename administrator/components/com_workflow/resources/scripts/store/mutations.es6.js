@@ -44,6 +44,11 @@ export default {
       return stage;
     });
   },
+  SET_CANVAS_VIEWPORT(state, { zoom, panX, panY }) {
+    state.canvas.zoom = zoom;
+    state.canvas.panX = panX;
+    state.canvas.panY = panY;
+  },
   ADD_TO_HISTORY(state, snapshot) {
     if (snapshot === state.history[state.historyIndex]) {
       return;

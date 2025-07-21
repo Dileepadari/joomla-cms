@@ -11,10 +11,10 @@
     />
 
     <foreignObject
-      :x="labelX - 70"
-      :y="labelY - 20"
-      width="150"
-      height="40"
+      :x="labelX - 100"
+      :y="labelY - 35"
+      width="200"
+      height="70"
       class="edge-label"
       tabindex="0"
       :data-edge-id="data?.id"
@@ -22,38 +22,35 @@
       @focus="onEdgeFocus"
       @blur="onEdgeBlur"
     >
-      <div class="d-flex align-items-center border text-bg-primary rounded shadow-sm px-2 py-1 gap-1 h-40 m-auto">
-        <span
-          class="h3 d-block text-truncate text-center text-white flex-grow-1 fw-semibold h-100 m-auto align-content-center"
-          :style="{ maxWidth: data?.isTransitionMode ? '80px' : '100%' }"
-          :title="data?.title"
-        >
-          {{ data?.title }}
-        </span>
-        <button
-          class="btn btn-md btn-secondary py-0 px-1"
-          :class="data?.isTransitionMode ? 'd-block' : 'd-none'"
-          :aria-label="translate('COM_WORKFLOW_GRAPH_EDIT_TRANSITION')"
-          :title="translate('COM_WORKFLOW_GRAPH_EDIT_TRANSITION')"
-          @click.stop="data?.onEdit?.()"
-        >
-          <i
-            class="icon icon-edit"
-            aria-hidden="true"
-          />
-        </button>
-        <button
-          class="btn btn-md btn-danger py-0 px-1"
-          :class="data?.isTransitionMode ? 'd-block' : 'd-none'"
-          :aria-label="translate('COM_WORKFLOW_GRAPH_DELETE_TRANSITION_TITLE')"
-          :title="translate('COM_WORKFLOW_GRAPH_DELETE_TRANSITION_TITLE')"
-          @click.stop="data?.onDelete?.()"
-        >
-          <i
-            class="icon icon-trash"
-            aria-hidden="true"
-          />
-        </button>
+      <div class="d-flex flex-column border text-bg-primary">
+        <div class="d-flex justify-content-end mb-1" v-if="data?.isTransitionMode">
+          <button
+            class="btn btn-md btn-secondary py-0 px-1 me-1"
+            :aria-label="translate('COM_WORKFLOW_GRAPH_EDIT_TRANSITION')"
+            :title="translate('COM_WORKFLOW_GRAPH_EDIT_TRANSITION')"
+            @click.stop="data?.onEdit?.()"
+          >
+            <i class="icon icon-edit" aria-hidden="true"/>
+          </button>
+          <button
+            class="btn btn-md btn-danger py-0 px-1"
+            :aria-label="translate('COM_WORKFLOW_GRAPH_DELETE_TRANSITION_TITLE')"
+            :title="translate('COM_WORKFLOW_GRAPH_DELETE_TRANSITION_TITLE')"
+            @click.stop="data?.onDelete?.()"
+          >
+            <i class="icon icon-trash" aria-hidden="true"/>
+          </button>
+        </div>
+        <!-- Label row below buttons, centered horizontally -->
+        <div class="d-flex align-items-center rounded shadow-sm px-2 py-1 gap-1 flex-grow-1">
+      <span
+        class="h3 d-block text-truncate text-center text-white flex-grow-1 fw-semibold"
+        :style="{ maxWidth: '100%' }"
+        :title="data?.title"
+      >
+        {{ data?.title }}
+      </span>
+        </div>
       </div>
     </foreignObject>
   </g>
@@ -125,10 +122,10 @@ export default {
       return this.edgeData[0];
     },
     labelX() {
-      return this.edgeData[1];
+      return this.edgeData[1] + ((this.data?.offsetIndex < 0 ? this.data?.offsetIndex : 0) || 0) * 100;
     },
     labelY() {
-      return this.edgeData[2] + (this.data?.offsetIndex || 0) * 18;
+      return this.edgeData[2] + ((this.data?.offsetIndex > 0 ? this.data?.offsetIndex : 0) || 0) * 75;
     },
   },
   methods: {
