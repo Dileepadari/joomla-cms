@@ -46,7 +46,6 @@ abstract class AdminModel extends FormModel
      *
      * @var    string
      * @since  3.8.6
-     * @since  3.8.6
      */
     public $typeAlias;
 

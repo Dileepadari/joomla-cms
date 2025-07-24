@@ -232,7 +232,7 @@ class StagesController extends AdminController
             ];
             echo new JsonResponse($response);
         } catch (\Exception $e) {
-            http_response_code(500);
+            $this->app->setHeader('status', 500);
             echo new JsonResponse($e->getMessage(), 'error', true);
         }
         $this->app->close();

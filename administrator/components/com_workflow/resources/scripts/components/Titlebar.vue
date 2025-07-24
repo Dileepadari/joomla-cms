@@ -5,12 +5,12 @@
     role="region"
   >
     <div class="col-md-6 d-flex flex-column">
-      <h1
+      <h2
         id="workflow-title"
-        class="h2 mb-2"
+        class="mb-2"
       >
         {{ translate(workflow?.title) }}
-      </h1>
+      </h2>
       <dl
         class="d-flex align-items-center flex-wrap mb-0"
         aria-label="workflow details"
@@ -54,7 +54,7 @@
         'text-warning': saveStatus.value === 'unsaved',
         'text-muted': saveStatus.value !== 'unsaved'
       }"
-      class="mb-2 text-success fw-bold"
+      class="mb-2 text-primaryt fw-bold"
     >
       {{
         saveStatus.value === 'unsaved'

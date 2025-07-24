@@ -124,7 +124,7 @@ class GraphController extends AdminController
     {
 
         try {
-            $id    = $this->input->getInt('workflow_id');
+            $id    = $this->workflowId;
             $model = $this->getModel('Workflow');
 
             if (empty($id)) {
@@ -157,7 +157,7 @@ class GraphController extends AdminController
 
             echo new JsonResponse($response);
         } catch (\Exception $e) {
-            http_response_code(500);
+            $this->app->setHeader('status', 500);
             echo new JsonResponse($e->getMessage(), 'error', true);
         }
 
@@ -177,7 +177,7 @@ class GraphController extends AdminController
     public function getStages()
     {
         try {
-            $workflowId = $this->input->getInt('workflow_id');
+            $workflowId = $this->workflowId;;
             $model      = $this->getModel('Stages');
 
             if (empty($workflowId)) {
@@ -217,7 +217,7 @@ class GraphController extends AdminController
             }
             echo new JsonResponse($response);
         } catch (\Exception $e) {
-            http_response_code(500);
+            $this->app->setHeader('status', 500);
             echo new JsonResponse($e->getMessage(), 'error', true);
         }
 
@@ -239,7 +239,7 @@ class GraphController extends AdminController
     {
 
         try {
-            $workflowId = $this->input->getInt('workflow_id');
+            $workflowId = $this->workflowId;;
             $model      = $this->getModel('Transitions');
 
             if (empty($workflowId)) {
@@ -276,7 +276,7 @@ class GraphController extends AdminController
 
             echo new JsonResponse($response);
         } catch (\Exception $e) {
-            http_response_code(500);
+            $this->app->setHeader('status', 500);
             echo new JsonResponse($e->getMessage(), 'error', true);
         }
 
@@ -346,7 +346,7 @@ class GraphController extends AdminController
                 echo new JsonResponse($response);
             }
         } catch (\Exception $e) {
-            http_response_code(500);
+            $this->app->setHeader('status', 500);
             echo new JsonResponse($e->getMessage(), 'error', true);
         }
         $this->app->close();
@@ -388,7 +388,7 @@ class GraphController extends AdminController
             // Invoke the postDelete method to allow for the child class to access the model.
             $this->postDeleteHook($model, $cid);
         } catch (\Exception $e) {
-            http_response_code(500);
+            $this->app->setHeader('status', 500);
             echo new JsonResponse($e->getMessage(), 'error', true);
         }
 
