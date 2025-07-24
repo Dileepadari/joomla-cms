@@ -177,7 +177,7 @@ class GraphController extends AdminController
     public function getStages()
     {
         try {
-            $workflowId = $this->workflowId;;
+            $workflowId = $this->workflowId;
             $model      = $this->getModel('Stages');
 
             if (empty($workflowId)) {
@@ -239,7 +239,7 @@ class GraphController extends AdminController
     {
 
         try {
-            $workflowId = $this->workflowId;;
+            $workflowId = $this->workflowId;
             $model      = $this->getModel('Transitions');
 
             if (empty($workflowId)) {
