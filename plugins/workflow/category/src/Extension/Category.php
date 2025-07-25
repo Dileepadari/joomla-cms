@@ -34,6 +34,7 @@ defined('_JEXEC') or die;
 final class Category extends CMSPlugin implements SubscriberInterface
 {
     use WorkflowPluginTrait;
+
     /**
      * Load the language file on instantiation.
      *
@@ -272,7 +273,6 @@ final class Category extends CMSPlugin implements SubscriberInterface
         $result = false;
 
         try {
-
             $component = $this->getApplication()->bootComponent('com_content');
             $modelName = $component->getModelName('com_workflow.article');
 
@@ -332,6 +332,5 @@ final class Category extends CMSPlugin implements SubscriberInterface
             return false;
         }
         return true;
-
     }
 }
