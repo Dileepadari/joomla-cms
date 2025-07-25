@@ -54,7 +54,7 @@
         'text-warning': saveStatus.value === 'unsaved',
         'text-muted': saveStatus.value !== 'unsaved'
       }"
-      class="mb-2 text-primaryt fw-bold"
+      class="mb-2 text-primary fw-bold"
     >
       {{
         saveStatus.value === 'unsaved'
