@@ -11,8 +11,8 @@
 namespace Joomla\Plugin\Workflow\Category\Extension;
 
 use Joomla\CMS\Event\Model\PrepareFormEvent;
-use Joomla\CMS\Event\Workflow\WorkflowTransitionEvent;
 use Joomla\CMS\Event\View\DisplayEvent;
+use Joomla\CMS\Event\Workflow\WorkflowTransitionEvent;
 use Joomla\CMS\Form\Form;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Plugin\CMSPlugin;
@@ -23,7 +23,7 @@ use Joomla\Registry\Registry;
 use Joomla\String\Inflector;
 
 // phpcs:disable PSR1.Files.SideEffects
-defined('_JEXEC') or die;
+\defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**
@@ -53,9 +53,9 @@ final class Category extends CMSPlugin implements SubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'onAfterDisplay'             => 'onAfterDisplay',
-            'onContentPrepareForm'       => 'onContentPrepareForm',
-            'onWorkflowAfterTransition'  => 'onWorkflowAfterTransition',
+            'onAfterDisplay'            => 'onAfterDisplay',
+            'onContentPrepareForm'      => 'onContentPrepareForm',
+            'onWorkflowAfterTransition' => 'onWorkflowAfterTransition',
         ];
     }
 
@@ -68,8 +68,8 @@ final class Category extends CMSPlugin implements SubscriberInterface
      */
     public function onContentPrepareForm(PrepareFormEvent $event)
     {
-        $form = $event->getForm();
-        $data = $event->getData();
+        $form    = $event->getForm();
+        $data    = $event->getData();
         $context = $form->getName();
 
         // Extend the transition form
@@ -232,14 +232,14 @@ final class Category extends CMSPlugin implements SubscriberInterface
 
         $app = $this->getApplication();
 
-        if (!is_object($transition) || !($transition->options instanceof Registry)) {
+        if (!\is_object($transition) || !($transition->options instanceof Registry)) {
             $app->enqueueMessage('PLG_WORKFLOW_CATEGORY_INVALID_TRANSITION');
             return;
         }
 
 
 
-        if (empty($pks) || !is_array($pks)) {
+        if (empty($pks) || !\is_array($pks)) {
             $app->enqueueMessage(Text::_('PLG_WORKFLOW_CATEGORY_NO_PRIMARY_KEY'), 'error');
             return;
         }
@@ -269,7 +269,7 @@ final class Category extends CMSPlugin implements SubscriberInterface
      */
     private function processArticle($pk, $categoryId): bool
     {
-        $app = $this->getApplication();
+        $app    = $this->getApplication();
         $result = false;
 
         try {
@@ -289,7 +289,7 @@ final class Category extends CMSPlugin implements SubscriberInterface
                     $articleTable->catid = $categoryId;
                 }
 
-                $articleTable->modified = $originalData->modified;
+                $articleTable->modified    = $originalData->modified;
                 $articleTable->modified_by = $originalData->modified_by;
 
                 if (!$articleTable->store()) {
