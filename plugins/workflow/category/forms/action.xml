@@ -9,8 +9,11 @@
                 type="category"
                 label="PLG_WORKFLOW_CATEGORY_FIELD_CATEGORY_LABEL"
                 description="PLG_WORKFLOW_CATEGORY_FIELD_CATEGORY_DESC"
-                extension="com_content"
-            />
+				default=""
+				hide_all="true"
+            >
+				<option value="">JOPTION_DO_NOT_USE</option>
+			</field>
         </fieldset>
     </fields>
 </form>
