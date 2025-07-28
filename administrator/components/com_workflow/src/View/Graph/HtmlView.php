@@ -13,6 +13,7 @@ namespace Joomla\Component\Workflow\Administrator\View\Graph;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\FileLayout;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Router\Route;
@@ -145,14 +146,6 @@ class HtmlView extends BaseHtmlView
         $itemEditable = $canDo->get('core.edit') || ($canDo->get('core.edit.own') && $this->item->created_by == $userId);
         $arrow        = $this->getLanguage()->isRtl() ? 'arrow-right' : 'arrow-left';
 
-        $shortcutsPopupId      = 'shortcuts-popup-content';
-        $shortcutsPopupOptions = json_encode([
-            'src'             => '#' . $shortcutsPopupId,
-            'width'           => '800px',
-            'height'          => 'fit-content',
-            'textHeader'      => Text::_('COM_WORKFLOW_GRAPH_SHORTCUTS_TITLE'),
-            'preferredParent' => 'body',
-        ]);
         $toolbar->link(
             'JTOOLBAR_BACK',
             Route::_('index.php?option=com_workflow&view=workflows&extension=' . $this->escape($this->item->extension))
@@ -161,24 +154,18 @@ class HtmlView extends BaseHtmlView
 
 
         if ($itemEditable) {
+            $undoLayout = new FileLayout('toolbar.undo', JPATH_ADMINISTRATOR . '/components/com_workflow/layouts');
             $toolbar->customButton('undo')
-                ->html('<joomla-toolbar-button><button onclick="WorkflowGraph.Event.fire(\'onClickUndoWorkflow\')" '
-            . 'class="btn btn-info action-button" tabindex="0"><span class="icon-undo-2 icon-fw" aria-hidden="true"></span>'
-            . Text::_('COM_WORKFLOW_UNDO') . '</button></joomla-toolbar-button>');
+                ->html($undoLayout->render([]));
 
+            $redoLayout = new FileLayout('toolbar.redo', JPATH_ADMINISTRATOR . '/components/com_workflow/layouts');
             $toolbar->customButton('redo')
-                ->html('<joomla-toolbar-button><button onclick="WorkflowGraph.Event.fire(\'onClickRedoWorkflow\')" '
-                    . 'class="btn btn-info action-button" tabindex="0"><span class="icon-redo icon-fw" aria-hidden="true"></span>'
-                    . Text::_('COM_WORKFLOW_REDO') . '</button></joomla-toolbar-button>');
-
-
+                ->html($redoLayout->render([]));
 
             $toolbar->help('Workflow');
+            $shortcutsLayout = new FileLayout('toolbar.shortcuts', JPATH_ADMINISTRATOR . '/components/com_workflow/layouts');
             $toolbar->customButton('Shortcuts')
-                ->html('<joomla-toolbar-button><button class="btn btn-info action-button" data-joomla-dialog="'
-                    . htmlspecialchars($shortcutsPopupOptions, ENT_QUOTES, 'UTF-8') . '" tabindex="0"'
-                    . 'title="' . Text::_('COM_WORKFLOW_GRAPH_SHORTCUTS') . '"><span class="fa fa-keyboard" aria-hidden="true"></span>'
-                    . Text::_('COM_WORKFLOW_GRAPH_SHORTCUTS') . '</button></joomla-toolbar-button>');
+                ->html($shortcutsLayout->render([]));
         }
     }
 }
