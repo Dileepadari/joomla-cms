@@ -270,7 +270,6 @@ final class Category extends CMSPlugin implements SubscriberInterface
     private function processArticle($pk, $categoryId): bool
     {
         $app    = $this->getApplication();
-        $result = false;
 
         try {
             $component = $this->getApplication()->bootComponent('com_content');
@@ -281,28 +280,30 @@ final class Category extends CMSPlugin implements SubscriberInterface
             if (!$articleTable->load($pk)) {
                 $app->enqueueMessage(Text::sprintf('PLG_WORKFLOW_CATEGORY_ARTICLE_NOT_FOUND', $pk), 'warning');
                 return false;
-            } elseif ($articleTable->catid == $categoryId) {
-                $result = true;
+            }
+
+            if ($articleTable->catid == $categoryId) {
+                return true;
+            }
+
+            $originalData = clone $articleTable;
+            if ($categoryId && $categoryId > 0) {
+                $articleTable->catid = $categoryId;
+            }
+
+            $articleTable->modified    = $originalData->modified;
+            $articleTable->modified_by = $originalData->modified_by;
+
+            if (!$articleTable->store()) {
+                $app->enqueueMessage(Text::sprintf('PLG_WORKFLOW_CATEGORY_ARTICLE_UPDATE_FAILED', $pk, $categoryId), 'error');
             } else {
-                $originalData = clone $articleTable;
-                if ($categoryId && $categoryId > 0) {
-                    $articleTable->catid = $categoryId;
-                }
-
-                $articleTable->modified    = $originalData->modified;
-                $articleTable->modified_by = $originalData->modified_by;
-
-                if (!$articleTable->store()) {
-                    $app->enqueueMessage(Text::sprintf('PLG_WORKFLOW_CATEGORY_ARTICLE_UPDATE_FAILED', $pk, $categoryId), 'error');
-                } else {
-                    $result = true;
-                }
+                return true;
             }
         } catch (\RuntimeException $e) {
             $app->enqueueMessage(Text::sprintf('PLG_WORKFLOW_CATEGORY_ARTICLE_UPDATE_ERROR', $pk) . ': ' . $e->getMessage(), 'error');
         }
 
-        return $result;
+        return false;
     }
 
     /**

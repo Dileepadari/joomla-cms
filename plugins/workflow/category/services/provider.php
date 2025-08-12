@@ -32,11 +32,11 @@ return new class () implements ServiceProviderInterface {
     {
         $container->set(
             PluginInterface::class,
-            function (Container $container) {
+            function () {
                 $plugin = new Category(
-                    $container->get(DispatcherInterface::class),
                     (array) PluginHelper::getPlugin('workflow', 'category')
                 );
+
                 $plugin->setApplication(Factory::getApplication());
 
                 return $plugin;
