@@ -10,6 +10,7 @@
 
 namespace Joomla\Plugin\Workflow\Category\Extension;
 
+use Doctrine\Inflector\InflectorFactory;
 use Joomla\CMS\Event\Model\PrepareFormEvent;
 use Joomla\CMS\Event\View\DisplayEvent;
 use Joomla\CMS\Event\Workflow\WorkflowTransitionEvent;
@@ -20,7 +21,6 @@ use Joomla\CMS\Workflow\WorkflowPluginTrait;
 use Joomla\CMS\Workflow\WorkflowServiceInterface;
 use Joomla\Event\SubscriberInterface;
 use Joomla\Registry\Registry;
-use Joomla\String\Inflector;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -168,14 +168,14 @@ final class Category extends CMSPlugin implements SubscriberInterface
         $section   = $event->getArgument('section');
 
         // We need the single model context for checking for workflow
-        $singularsection = Inflector::singularize($section);
+        $singularsection = InflectorFactory::create()->build()->singularize($section);
 
         if (!$this->isSupported($component . '.' . $singularsection)) {
             return;
         }
 
         $layoutFile = JPATH_PLUGINS . '/workflow/category/layouts/scripts/disableCategoryBatch.js';
-        $js = file_get_contents($layoutFile);
+        $js         = file_get_contents($layoutFile);
 
         $this->getApplication()->getDocument()->addScriptDeclaration($js);
     }
