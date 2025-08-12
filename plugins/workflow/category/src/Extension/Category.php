@@ -66,7 +66,7 @@ final class Category extends CMSPlugin implements SubscriberInterface
      *
      * @since   __DEPLOY_VERSION__
      */
-    public function onContentPrepareForm(PrepareFormEvent $event)
+    public function onContentPrepareForm(PrepareFormEvent $event): void
     {
         $form    = $event->getForm();
         $data    = $event->getData();
@@ -94,7 +94,7 @@ final class Category extends CMSPlugin implements SubscriberInterface
      *
      * @since   __DEPLOY_VERSION__
      */
-    protected function enhanceTransitionForm(Form $form, $data)
+    protected function enhanceTransitionForm(Form $form, $data): bool
     {
         $workflow = $this->enhanceWorkflowTransitionForm($form, $data);
 
@@ -174,30 +174,8 @@ final class Category extends CMSPlugin implements SubscriberInterface
             return;
         }
 
-        $js = "
-            document.addEventListener('DOMContentLoaded', function()
-            {
-                var dropdown = document.getElementById('toolbar-status-group');
-                if (!dropdown){
-                    return;
-                }
-                var batchButton = document.getElementById('status-group-children-batch');
-                if (batchButton){
-                    batchButton.addEventListener('click', function()
-                    {
-                        var observer = new MutationObserver(function(mutations, observer) {
-                            var categorySelector = document.getElementById('batch-category-id');
-                            if (categorySelector) {
-                                categorySelector.disabled = true;
-                                observer.disconnect();
-                            }
-                        });
-
-                        observer.observe(document.body, { childList: true, subtree: true });
-                    });
-                }
-            });
-        ";
+        $layoutFile = JPATH_PLUGINS . '/workflow/category/layouts/scripts/disableCategoryBatch.js';
+        $js = file_get_contents($layoutFile);
 
         $this->getApplication()->getDocument()->addScriptDeclaration($js);
     }
