@@ -3,7 +3,7 @@
     position="top-left"
     aria-labelledby="controls-panel-title"
     class="d-flex gap-2 p-2"
-    role="toolbar"
+    role="group"
   >
     <h2 id="controls-panel-title" class="visually-hidden">Workflow Creation Controls</h2>
 

@@ -81,5 +81,5 @@ $shortcutsHtml[] = '</section>';
 <template id="shortcuts-popup-content">
     <?php echo implode($shortcutsHtml); ?>
 </template>
-<section id="workflow-graph-root" role="region" aria-label="Workflow graph"></section>
+<section id="workflow-graph-root" aria-label="Workflow graph"></section>
 <script type="module" src="<?php echo $script ?>"></script>

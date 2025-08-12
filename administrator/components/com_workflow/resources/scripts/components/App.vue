@@ -2,13 +2,11 @@
   <main
     id="workflow-app"
     class="d-flex flex-column flex-grow-1 min-vh-80"
-    role="main"
     aria-labelledby="workflow-main-title"
   >
     <header
       id="workflow-header"
       class="d-flex flex-column flex-shrink-0"
-      role="banner"
     >
       <WorkflowTitlebar
         :save-status="saveStatus"
@@ -19,7 +17,6 @@
       <section
         id="main-canvas"
         class="flex-grow-1 position-relative"
-        role="application"
         aria-label="Workflow Canvas Application"
         aria-describedby="canvas-description"
       >

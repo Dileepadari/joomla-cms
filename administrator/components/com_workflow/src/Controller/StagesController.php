@@ -218,7 +218,7 @@ class StagesController extends AdminController
             }
 
             $app        = $this->app;
-            $input      = $app->input;
+            $input      = $app->getInput();
             $workflowId = $input->getInt('id');
             $positions  = $input->get('positions', [], 'array');
             $model      = $this->getModel('Stages', 'Administrator');

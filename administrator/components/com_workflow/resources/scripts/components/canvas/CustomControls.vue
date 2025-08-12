@@ -1,9 +1,8 @@
 <template>
-  <nav
+  <div
     ref="controlsContainer"
     class="custom-controls z-10"
-    tabindex="0"
-    role="toolbar"
+    role="group"
     aria-labelledby="canvas-controls-title"
   >
     <h2 id="canvas-controls-title" class="visually-hidden">Canvas View Controls</h2>
@@ -55,7 +54,7 @@
         </button>
       </li>
     </ul>
-  </nav>
+  </div>
 </template>
 
 <script>
