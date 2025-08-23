@@ -119,7 +119,7 @@ final class Category extends CMSPlugin implements SubscriberInterface
 
     /**
      * Disable certain fields in the item form view, when we want to take over this function in the transition
-     * * Check also for the workflow implementation and if the field exists
+     * Check also for the workflow implementation and if the field exists
      *
      * @param   Form      $form  The form
      * @param   \stdClass    $data  The data
