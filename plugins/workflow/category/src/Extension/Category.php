@@ -11,6 +11,7 @@
 namespace Joomla\Plugin\Workflow\Category\Extension;
 
 use Doctrine\Inflector\InflectorFactory;
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Event\Model\PrepareFormEvent;
 use Joomla\CMS\Event\View\DisplayEvent;
 use Joomla\CMS\Event\Workflow\WorkflowTransitionEvent;
@@ -42,6 +43,12 @@ final class Category extends CMSPlugin implements SubscriberInterface
      * @since  __DEPLOY_VERSION__
      */
     protected $autoloadLanguage = true;
+
+    /**
+     * @var  CMSApplication
+     * @since  __DEPLOY_VERSION__
+     */
+    protected $app;
 
     /**
      * Returns an array of events this subscriber will listen to.
@@ -111,7 +118,7 @@ final class Category extends CMSPlugin implements SubscriberInterface
     }
 
     /**
-     * Disable certain fields in the item  form view, when we want to take over this function in the transition
+     * Disable certain fields in the item form view, when we want to take over this function in the transition
      * * Check also for the workflow implementation and if the field exists
      *
      * @param   Form      $form  The form
@@ -174,10 +181,8 @@ final class Category extends CMSPlugin implements SubscriberInterface
             return;
         }
 
-        $layoutFile = JPATH_PLUGINS . '/workflow/category/layouts/scripts/disableCategoryBatch.js';
-        $js         = file_get_contents($layoutFile);
-
-        $this->getApplication()->getDocument()->addScriptDeclaration($js);
+        $this->getApplication()->getDocument()->getWebAssetManager()
+            ->registerAndUseScript('plg_workflow_category.disableBatch', 'plg_workflow_category/disable-category-batch.js', [], ['defer' => true], ['core']);
     }
 
     /**
@@ -214,8 +219,6 @@ final class Category extends CMSPlugin implements SubscriberInterface
             $app->enqueueMessage('PLG_WORKFLOW_CATEGORY_INVALID_TRANSITION');
             return;
         }
-
-
 
         if (empty($pks) || !\is_array($pks)) {
             $app->enqueueMessage(Text::_('PLG_WORKFLOW_CATEGORY_NO_PRIMARY_KEY'), 'error');

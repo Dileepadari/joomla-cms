@@ -2,7 +2,7 @@
 <extension type="plugin" group="workflow" method="upgrade">
 	<name>plg_workflow_category</name>
 	<author>Joomla! Project</author>
-	<creationDate>2025-06</creationDate>
+	<creationDate>2025-08</creationDate>
 	<copyright>(C) 2025 Open Source Matters, Inc.</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>admin@joomla.org</authorEmail>

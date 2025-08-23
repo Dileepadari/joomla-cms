@@ -360,6 +360,7 @@ class ExtensionHelper
         ['plugin', 'featuring', 'workflow', 0],
         ['plugin', 'notification', 'workflow', 0],
         ['plugin', 'publishing', 'workflow', 0],
+        ['plugin', 'category', 'workflow', 0],
 
         // Core template extensions - administrator
         ['template', 'atum', '', 1],
