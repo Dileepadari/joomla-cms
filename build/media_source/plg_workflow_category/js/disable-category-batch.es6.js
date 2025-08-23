@@ -6,7 +6,7 @@
 ((document, Joomla) => {
   'use strict';
 
-  const diableCategory = () => {
+  const disableCategory = () => {
     var dropdown = document.getElementById('toolbar-status-group');
     if (!dropdown) {
       return;
@@ -28,6 +28,6 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    diableCategory();
+    disableCategory();
   });
 })(document, Joomla);
