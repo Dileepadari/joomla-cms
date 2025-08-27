@@ -33,12 +33,10 @@ $shortcuts = [
     ['key' => 'Alt + N',             'description' => 'Add Stage'],
     ['key' => 'Alt + M',             'description' => 'Add Transition'],
     ['key' => 'Enter / SpaceBar',    'description' => 'Select Item'],
-    ['key' => 'Alt + U',             'description' => 'Edit Item'],
     ['key' => 'Select + E',          'description' => 'Edit Item'],
-    ['key' => 'Alt + Shift + D',     'description' => 'Delete Item'],
     ['key' => 'Select + Delete',     'description' => 'Delete Item'],
     ['key' => 'Select + Backspace',  'description' => 'Delete Item'],
-    ['key' => 'Alt + C',             'description' => 'Toggle Mode'],
+    ['key' => 'Select + Shift + Arrows', 'description' => 'Move Stage'],
     ['key' => 'Ctrl/Cmd + Z',        'description' => 'Undo'],
     ['key' => 'Ctrl/Cmd + Y',        'description' => 'Redo'],
     ['key' => 'Escape',              'description' => 'Clear Selection'],
@@ -46,9 +44,8 @@ $shortcuts = [
     ['key' => '- / _',               'description' => 'Zoom Out'],
     ['key' => 'F',                   'description' => 'Fit View'],
     ['key' => 'Tab',                 'description' => 'Focus Type Change'],
-    ['key' => 'Arrows',          'description' => 'Navigate Nodes'],
-    ['key' => 'Shift + Arrows',  'description' => 'Move View'],
-    ['key' => 'Select + Arrows', 'description' => 'Move Stage'],
+    ['key' => 'Arrows',              'description' => 'Navigate Nodes'],
+    ['key' => 'Shift + Arrows',      'description' => 'Move View'],
 ];
 
 $col1 = array_slice($shortcuts, 0, ceil(count($shortcuts) / 2));
