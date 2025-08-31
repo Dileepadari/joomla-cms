@@ -139,7 +139,7 @@ class HtmlView extends BaseHtmlView
         $this->filterForm    = $model->getFilterForm();
         $this->activeFilters = $model->getActiveFilters();
         $this->workflow      = $model->getWorkflow();
-        
+
         $this->workflowID    = $this->workflow->id;
 
         $parts = explode('.', $this->workflow->extension);
