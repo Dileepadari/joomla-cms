@@ -20,7 +20,6 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Log\Log;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\Model\AdminModel;
-use Joomla\CMS\Object\CMSObject;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Table\Table;
 use Joomla\Component\Scheduler\Administrator\Helper\ExecRuleHelper;
@@ -119,7 +118,7 @@ class TaskModel extends AdminModel
      */
     public function __construct($config = [], ?MVCFactoryInterface $factory = null, ?FormFactoryInterface $formFactory = null)
     {
-        $config['events_map'] = $config['events_map'] ?? [];
+        $config['events_map'] ??= [];
 
         $config['events_map'] = array_merge(
             [
@@ -154,7 +153,7 @@ class TaskModel extends AdminModel
      * @param   array  $data      Data that needs to go into the form
      * @param   bool   $loadData  Should the form load its data from the DB?
      *
-     * @return Form|boolean  A Form object on success, false on failure.
+     * @return Form  A Form object
      *
      * @since  4.1.0
      * @throws \Exception
@@ -169,10 +168,6 @@ class TaskModel extends AdminModel
          *  $form->bind($data).
          */
         $form = $this->loadForm('com_scheduler.task', 'task', ['control' => 'jform', 'load_data' => $loadData]);
-
-        if (empty($form)) {
-            return false;
-        }
 
         $user = $this->app->getIdentity();
 
@@ -255,7 +250,7 @@ class TaskModel extends AdminModel
      * @since  4.1.0
      * @throws \Exception
      */
-    public function getTable($name = 'Task', $prefix = 'Table', $options = []): Table
+    public function getTable($name = 'Task', $prefix = 'Administrator', $options = []): Table
     {
         return parent::getTable($name, $prefix, $options);
     }
@@ -274,7 +269,6 @@ class TaskModel extends AdminModel
 
         // If the data from UserState is empty, we fetch it with getItem()
         if (empty($data)) {
-            /** @var CMSObject $data */
             $data = $this->getItem();
 
             // @todo : further data processing goes here
@@ -323,14 +317,14 @@ class TaskModel extends AdminModel
         }
 
         // Parent call leaves `execution_rules` and `cron_rules` JSON encoded
-        $item->set('execution_rules', json_decode($item->get('execution_rules', '')));
-        $item->set('cron_rules', json_decode($item->get('cron_rules', '')));
+        $item->execution_rules = json_decode($item->execution_rules ?? '');
+        $item->cron_rules      = json_decode($item->cron_rules ?? '');
 
         $taskOption = SchedulerHelper::getTaskOptions()->findOption(
             ($item->id ?? 0) ? ($item->type ?? 0) : $this->getState('task.type')
         );
 
-        $item->set('taskOption', $taskOption);
+        $item->taskOption = $taskOption;
 
         return $item;
     }
@@ -398,7 +392,7 @@ class TaskModel extends AdminModel
 
             $db->setQuery($lockQuery)->execute();
             $affectedRows = $db->getAffectedRows();
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             return null;
         } finally {
             $db->unlockTables();
@@ -420,7 +414,7 @@ class TaskModel extends AdminModel
      */
     private function hasRunningTasks($db): bool
     {
-        $lockCountQuery = $db->getQuery(true)
+        $lockCountQuery = $db->createQuery()
             ->select('COUNT(id)')
             ->from($db->quoteName(self::TASK_TABLE))
             ->where($db->quoteName('locked') . ' IS NOT NULL')
@@ -428,7 +422,7 @@ class TaskModel extends AdminModel
 
         try {
             $runningCount = $db->setQuery($lockCountQuery)->loadResult();
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             return false;
         }
 
@@ -450,7 +444,7 @@ class TaskModel extends AdminModel
      */
     private function buildLockQuery($db, $now, $options)
     {
-        $lockQuery = $db->getQuery(true)
+        $lockQuery = $db->createQuery()
             ->update($db->quoteName(self::TASK_TABLE))
             ->set($db->quoteName('locked') . ' = :now1')
             ->bind(':now1', $now);
@@ -495,7 +489,7 @@ class TaskModel extends AdminModel
      */
     private function getNextTaskId($db, $now, $options)
     {
-        $idQuery = $db->getQuery(true)
+        $idQuery = $db->createQuery()
             ->from($db->quoteName(self::TASK_TABLE))
             ->select($db->quoteName('id'));
 
@@ -527,7 +521,7 @@ class TaskModel extends AdminModel
 
         try {
             return $db->setQuery($idQuery)->loadColumn();
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             return [];
         }
     }
@@ -543,7 +537,7 @@ class TaskModel extends AdminModel
      */
     private function fetchTask($db, $now): ?\stdClass
     {
-        $getQuery = $db->getQuery(true)
+        $getQuery = $db->createQuery()
             ->select('*')
             ->from($db->quoteName(self::TASK_TABLE))
             ->where($db->quoteName('locked') . ' = :now')
@@ -551,7 +545,7 @@ class TaskModel extends AdminModel
 
         try {
             $task = $db->setQuery($getQuery)->loadObject();
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             return null;
         }
 
@@ -613,7 +607,7 @@ class TaskModel extends AdminModel
             $basisDayOfMonth           = $data['execution_rules']['exec-day'];
             [$basisHour, $basisMinute] = explode(':', $data['execution_rules']['exec-time']);
 
-            $data['last_execution'] = Factory::getDate('now', 'GMT')->format('Y-m')
+            $data['last_execution'] = Factory::getDate('now', 'UTC')->format('Y-m')
                 . "-$basisDayOfMonth $basisHour:$basisMinute:00";
         } else {
             $data['last_execution'] = $this->getItem($id)->last_execution;
@@ -631,7 +625,7 @@ class TaskModel extends AdminModel
 
         // If no params, we set as empty array.
         // ? Is this the right place to do this
-        $data['params'] = $data['params'] ?? [];
+        $data['params'] ??= [];
 
         // Parent method takes care of saving to the table
         return parent::save($data);
@@ -692,7 +686,7 @@ class TaskModel extends AdminModel
         ];
 
         $ruleType        = $executionRules['rule-type'];
-        $ruleClass       = strpos($ruleType, 'interval') === 0 ? 'interval' : $ruleType;
+        $ruleClass       = str_starts_with($ruleType, 'interval') ? 'interval' : $ruleType;
         $buildExpression = '';
 
         if ($ruleClass === 'interval') {
